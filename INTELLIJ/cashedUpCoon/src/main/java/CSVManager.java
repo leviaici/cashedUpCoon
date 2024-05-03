@@ -25,7 +25,7 @@ public interface CSVManager {
         }
     }
 
-    static boolean verifyClientInCSV(String path, Client client) {
+    static boolean verifyClientNotInCSV(String path, Client client) {
         try {
             File file = new File(path);
             FileReader fr = new FileReader(file);
@@ -34,7 +34,7 @@ public interface CSVManager {
             String[] temporary;
             while ((line = br.readLine()) != null) {
                 temporary = line.split(",");
-                if (temporary[2].equals(client.getPhoneNumber())) {
+                if (temporary[2].equals(client.getPhoneNumber()) || temporary[1].equals(client.getEmail())) {
                     fr.close();
                     br.close();
                     return false;
@@ -58,7 +58,7 @@ public interface CSVManager {
                 file.createNewFile();
             }
             if (file.length() != 0) {
-                if (verifyClientInCSV(path, client)) {
+                if (verifyClientNotInCSV(path, client)) {
                     bw.newLine();
                 } else {
                     bw.close();
@@ -77,6 +77,12 @@ public interface CSVManager {
     static void updateClientCSV(String path, Client client) {
         try {
             File file = new File(path);
+            if (file.length() != 0) {
+                if (verifyClientNotInCSV(path, client)) {
+                    addClientCSV(path, client);
+                    return;
+                }
+            }
             FileReader fr = new FileReader(file);
             BufferedReader br = new BufferedReader(fr);
             String line;
@@ -84,11 +90,38 @@ public interface CSVManager {
             String data = "";
             while ((line = br.readLine()) != null) {
                 temporary = line.split(",");
-                if (temporary[2].equals(client.getPhoneNumber()))
+                if (temporary[2].equals(client.getPhoneNumber()) || temporary[1].equals(client.getEmail()))
                     data += client.getName() + "," + client.getEmail() + "," + client.getPhoneNumber() + "," + client.getAddress() + "," + client.getPassword() + "\n";
                 else
                     data += line + "\n";
             }
+            data = data.substring(0, data.length() - 1);
+            fr.close();
+            br.close();
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(data);
+            bw.close();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static void deleteClientCSV(String path, Client client) {
+        try {
+            File file = new File(path);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            String data = "";
+            while ((line = br.readLine()) != null) {
+                temporary = line.split(",");
+                if (!(temporary[2].equals(client.getPhoneNumber())))
+                    data += line + "\n";
+            }
+            data = data.substring(0, data.length() - 1);
             fr.close();
             br.close();
             FileWriter fw = new FileWriter(file);
