@@ -1,8 +1,8 @@
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
-// trebuie facuta clasa abstracta
-public class Card {
+
+abstract class Card {
     private String number;
     private String cvv;
     private Date expirationDate; // sdf: MM-YYYY
