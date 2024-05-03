@@ -1,21 +1,20 @@
 import java.util.Objects;
 import java.util.ArrayList;
-//
+
 public class Account {
     private String IBAN;
     private float balance;
-    private String currency; // possible mappings: USD, EUR, RON, GBP, etc.
+    private Currencies currency; // possible mappings: USD, EUR, RON, GBP, etc.
     ArrayList<Transaction> transactions = new ArrayList<>(); // possible next to become map
-    // TBA : Transaction history
 
-    public Account(String IBAN, float balance, String currency, ArrayList<Transaction> transactions) {
+    public Account(String IBAN, float balance, Currencies currency, ArrayList<Transaction> transactions) {
         this.IBAN = IBAN;
         this.balance = balance;
         this.currency = currency;
         this.transactions = transactions;
     }
 
-    public Account(String IBAN,  float balance, String currency) {
+    public Account(String IBAN,  float balance, Currencies currency) {
         this.IBAN = IBAN;
         this.balance = balance;
         this.currency = currency;
@@ -37,11 +36,11 @@ public class Account {
         this.balance = balance;
     }
 
-    public String getCurrency() {
+    public Currencies getCurrency() {
         return currency;
     }
 
-    public void setCurrency(String currency) {
+    public void setCurrency(Currencies currency) {
         this.currency = currency;
     }
 
@@ -51,6 +50,31 @@ public class Account {
 
     public void setTransactions(ArrayList<Transaction> transactions) {
         this.transactions = transactions;
+    }
+
+    public void addTransaction(Transaction transaction) {
+        transactions.add(transaction);
+    }
+
+    public void removeTransaction(Transaction transaction) {
+        transactions.remove(transaction);
+    }
+
+    public void addFunds(float amount) {
+        balance += amount;
+    }
+
+    public void withdrawFunds(float amount) {
+        balance -= amount;
+    }
+
+    public boolean transferFunds(Account destination, float amount) {
+        if (balance < amount)
+            return false;
+        addTransaction(new Transaction(IBAN, destination.getIBAN(), amount, currency.toString()));
+        withdrawFunds(amount);
+        destination.addFunds(amount);
+        return true;
     }
 
     @Override

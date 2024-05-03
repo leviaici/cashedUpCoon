@@ -6,12 +6,12 @@ public class SavingsAccount extends Account {
     private float interestRate;
     private Date dayOfPayment = new Date(); // sdf: dd
 
-    public SavingsAccount(String IBAN, float balance, String currency, float interestRate) {
+    public SavingsAccount(String IBAN, float balance, Currencies currency, float interestRate) {
         super(IBAN, balance, currency);
         this.interestRate = interestRate;
     }
 
-    public SavingsAccount(String IBAN, float balance, String currency, float interestRate, Date dayOfPayment) {
+    public SavingsAccount(String IBAN, float balance, Currencies currency, float interestRate, Date dayOfPayment) {
         super(IBAN, balance, currency);
         this.interestRate = interestRate;
         this.dayOfPayment = dayOfPayment;

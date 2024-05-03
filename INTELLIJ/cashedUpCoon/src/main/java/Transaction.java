@@ -3,7 +3,7 @@ import java.util.Objects;
 import java.text.SimpleDateFormat;
 
 public class Transaction {
-    private static int id_counter = 1;
+    private static int idCounter = 1;
     private int id;
     private String sourceIBAN;
     private String destinationIBAN;
@@ -12,7 +12,7 @@ public class Transaction {
     private Date date;
 
     public Transaction(String sourceIBAN, String destinationIBAN, float amount, String currency, Date date) {
-        this.id = id_counter++;
+        this.id = idCounter++;
         this.sourceIBAN = sourceIBAN;
         this.destinationIBAN = destinationIBAN;
         this.amount = amount;
@@ -21,7 +21,7 @@ public class Transaction {
     }
 
     public Transaction(String sourceIBAN, String destinationIBAN, float amount, String currency) {
-        this.id = id_counter++;
+        this.id = idCounter++;
         this.sourceIBAN = sourceIBAN;
         this.destinationIBAN = destinationIBAN;
         this.amount = amount;
@@ -30,7 +30,7 @@ public class Transaction {
     }
 
     public static int getId_counter() {
-        return id_counter;
+        return idCounter;
     }
 
     public int getId() {
