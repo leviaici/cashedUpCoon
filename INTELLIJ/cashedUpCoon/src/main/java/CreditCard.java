@@ -9,6 +9,11 @@ public class CreditCard extends Card {
         this.creditLimitPerTransaction = creditLimitPerTransaction;
     }
 
+    public CreditCard(String number, String cvv, Date expirationDate, Boolean blocked, float creditLimitPerTransaction) {
+        super(number, cvv, expirationDate, blocked);
+        this.creditLimitPerTransaction = creditLimitPerTransaction;
+    }
+
     public float getCreditLimitPerTransaction() {
         return creditLimitPerTransaction;
     }

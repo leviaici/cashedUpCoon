@@ -9,6 +9,11 @@ public class DebitCard extends Card {
         this.withdrawLimitPerTransaction = withdrawLimitPerTransaction;
     }
 
+    public DebitCard(String number, String cvv, Date expirationDate, Boolean blocked, int withdrawLimitPerTransaction) {
+        super(number, cvv, expirationDate, blocked);
+        this.withdrawLimitPerTransaction = withdrawLimitPerTransaction;
+    }
+
     public int getWithdrawLimitPerTransaction() {
         return withdrawLimitPerTransaction;
     }

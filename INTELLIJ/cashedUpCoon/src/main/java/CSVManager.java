@@ -98,6 +98,54 @@ public interface CSVManager {
             return null;
         }
     }
+    static ArrayList<CreditCard> readCreditCardCSV(String path, String phoneNumber) {
+        try {
+            ArrayList<CreditCard> cards = new ArrayList<>();
+            File file = new File(path);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            while ((line = br.readLine()) != null) {
+                CreditCard card;
+                temporary = line.split(",");
+                if (temporary[0].equals(phoneNumber)) {
+                    card = new CreditCard(temporary[1], temporary[2], new SimpleDateFormat("yyyy-MM").parse(temporary[3]), Boolean.parseBoolean(temporary[4]), Float.parseFloat(temporary[5]));
+                    cards.add(card);
+                }
+            }
+            fr.close();
+            br.close();
+            return cards;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    static ArrayList<DebitCard> readDebitCardCSV(String path, String phoneNumber) {
+        try {
+            ArrayList<DebitCard> cards = new ArrayList<>();
+            File file = new File(path);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            while ((line = br.readLine()) != null) {
+                DebitCard card;
+                temporary = line.split(",");
+                if (temporary[0].equals(phoneNumber)) {
+                    card = new DebitCard(temporary[1], temporary[2], new SimpleDateFormat("yyyy-MM").parse(temporary[3]), Boolean.parseBoolean(temporary[4]), Integer.parseInt(temporary[5]));
+                    cards.add(card);
+                }
+            }
+            fr.close();
+            br.close();
+            return cards;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     static boolean verifyClientNotInCSV(String path, Client client) {
         try {
@@ -155,6 +203,29 @@ public interface CSVManager {
             while ((line = br.readLine()) != null) {
                 temporary = line.split(",");
                 if (temporary[2].equals(transaction.getSourceIBAN()) && temporary[3].equals(transaction.getDestinationIBAN())) {
+                    fr.close();
+                    br.close();
+                    return false;
+                }
+            }
+            fr.close();
+            br.close();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    static boolean verifyCardNotInCSV(String path, Card card) {
+        try {
+            File file = new File(path);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            while ((line = br.readLine()) != null) {
+                temporary = line.split(",");
+                if (temporary[1].equals(card.getNumber())) {
                     fr.close();
                     br.close();
                     return false;
@@ -263,6 +334,56 @@ public interface CSVManager {
             }
             bw.write(phoneNumber1 + "," + phoneNumber2 + "," + transaction.getSourceIBAN() + "," + transaction.getDestinationIBAN() + "," + transaction.getAmount() + "," + transaction.getCurrency() + "," + new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").format(transaction.getDate()));
             System.out.println("Transaction added successfully!");
+            bw.close();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    static void addCreditCardCSV(String path, String phoneNumber, CreditCard card) {
+        try {
+            File file = new File(path);
+            FileWriter fw = new FileWriter(file, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            if (file.length() != 0) {
+                if (verifyCardNotInCSV(path, card)) {
+                    bw.newLine();
+                } else {
+                    bw.close();
+                    fw.close();
+                    return;
+                }
+            }
+            bw.write(phoneNumber + "," + card.getNumber() + "," + card.getCvv() + "," + new SimpleDateFormat("yyyy-MM").format(card.getExpirationDate()) + "," + card.getBlocked() + "," + card.getCreditLimitPerTransaction());
+            System.out.println("Credit card added successfully!");
+            bw.close();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    static void addDebitCardCSV(String path, String phoneNumber, DebitCard card) {
+        try {
+            File file = new File(path);
+            FileWriter fw = new FileWriter(file, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            if (file.length() != 0) {
+                if (verifyCardNotInCSV(path, card)) {
+                    bw.newLine();
+                } else {
+                    bw.close();
+                    fw.close();
+                    return;
+                }
+            }
+            bw.write(phoneNumber + "," + card.getNumber() + "," + card.getCvv() + "," + new SimpleDateFormat("yyyy-MM").format(card.getExpirationDate()) + "," + card.getBlocked() + "," + card.getWithdrawLimitPerTransaction());
+            System.out.println("Debit card added successfully!");
             bw.close();
             fw.close();
         } catch (IOException e) {
@@ -387,6 +508,62 @@ public interface CSVManager {
             e.printStackTrace();
         }
     }
+    static void updateCreditCardCSV(String path, CreditCard card) {
+        try {
+            File file = new File(path);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            String data = "";
+            while ((line = br.readLine()) != null) {
+                temporary = line.split(",");
+                if (temporary[1].equals(card.getNumber()))
+                    data += temporary[0] + "," + card.getNumber() + "," + card.getCvv() + "," + new SimpleDateFormat("yyyy-MM").format(card.getExpirationDate()) + "," + card.getBlocked() + "," + card.getCreditLimitPerTransaction() + "\n";
+                else
+                    data += line + "\n";
+            }
+            data = data.substring(0, data.length() - 1);
+            fr.close();
+            br.close();
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(data);
+            System.out.println("Credit card updated successfully!");
+            bw.close();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    static void updateDebitCardCSV(String path, DebitCard card) {
+        try {
+            File file = new File(path);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            String data = "";
+            while ((line = br.readLine()) != null) {
+                temporary = line.split(",");
+                if (temporary[1].equals(card.getNumber()))
+                    data += temporary[0] + "," + card.getNumber() + "," + card.getCvv() + "," + new SimpleDateFormat("yyyy-MM").format(card.getExpirationDate()) + "," + card.getBlocked() + "," + card.getWithdrawLimitPerTransaction() + "\n";
+                else
+                    data += line + "\n";
+            }
+            data = data.substring(0, data.length() - 1);
+            fr.close();
+            br.close();
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(data);
+            System.out.println("Debit card updated successfully!");
+            bw.close();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     static void deleteClientCSV(String path, Client client) {
         try {
@@ -472,6 +649,40 @@ public interface CSVManager {
             data = data.substring(0, data.length() - 1);
             if (deleted) {
                 System.out.println("Transaction deleted successfully!");
+            }
+            fr.close();
+            br.close();
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(data);
+            bw.close();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    static void deleteCardCSV(String path, Card card) {
+        try {
+            boolean deleted = false;
+            File file = new File(path);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            String data = "";
+            while ((line = br.readLine()) != null) {
+                temporary = line.split(",");
+                if (!(temporary[1].equals(card.getNumber())))
+                    data += line + "\n";
+                else
+                    deleted = true;
+            }
+            data = data.substring(0, data.length() - 1);
+            if (deleted) {
+                if (card.getClass() == CreditCard.class)
+                    System.out.println("Credit card deleted successfully!");
+                else
+                    System.out.println("Debit card deleted successfully!");
             }
             fr.close();
             br.close();

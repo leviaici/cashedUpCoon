@@ -1,7 +1,7 @@
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
-
+// trebuie facuta clasa abstracta
 public class Card {
     private String number;
     private String cvv;
@@ -68,7 +68,7 @@ public class Card {
 
     @Override
     public String toString() {
-        SimpleDateFormat sdf = new SimpleDateFormat("MM-yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
         return "Card:\n\t\tNumber: " + number + "\n\t\tCVV: " + cvv + "\n\t\tExpiration Date: " + sdf.format(expirationDate) + "\n\t\tBlocked: " + blocked + "\n";
     }
 }
