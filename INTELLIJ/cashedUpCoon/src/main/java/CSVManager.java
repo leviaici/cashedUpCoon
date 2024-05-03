@@ -305,8 +305,8 @@ public interface CSVManager {
                 else
                     deleted = true;
             }
+            data = data.substring(0, data.length() - 1);
             if (deleted) {
-                data = data.substring(0, data.length() - 1);
                 System.out.println("Client deleted successfully!");
             }
             fr.close();
@@ -336,9 +336,12 @@ public interface CSVManager {
                 else
                     deleted = true;
             }
+            data = data.substring(0, data.length() - 1);
             if (deleted) {
-                data = data.substring(0, data.length() - 1);
-                System.out.println("Account deleted successfully!");
+                if (account.getClass() == SavingsAccount.class)
+                    System.out.println("Savings account deleted successfully!");
+                else
+                    System.out.println("Account deleted successfully!");
             }
             fr.close();
             br.close();
