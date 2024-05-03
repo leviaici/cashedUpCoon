@@ -14,7 +14,7 @@ public class Account {
         this.transactions = transactions;
     }
 
-    public Account(String IBAN,  float balance, Currencies currency) {
+    public Account(String IBAN, float balance, Currencies currency) {
         this.IBAN = IBAN;
         this.balance = balance;
         this.currency = currency;

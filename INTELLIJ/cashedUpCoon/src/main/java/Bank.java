@@ -1,6 +1,7 @@
 import java.util.HashMap;
 
 public class Bank {
+//    private static Bank instance = null; // va fi singleton
     private String name;
     private HashMap<String, Client> clients = new HashMap<>();
 
@@ -55,5 +56,12 @@ public class Bank {
 
     public void initiateClients() {
         clients = CSVManager.readClientCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/clients_test.csv");
+//        for (String key : clients.keySet())
+//            CSVManager.createDirectory(clients.get(key));
+    }
+
+    public void initiateDirectories() {
+        for (String key : clients.keySet())
+            CSVManager.createDirectory(clients.get(key));
     }
 }
