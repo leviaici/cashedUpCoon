@@ -96,7 +96,7 @@ public class Transaction {
 
     @Override
     public String toString() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return "\t\tTransaction:\n\t\tID: " + id + "\n\t\tSource IBAN: " + sourceIBAN + "\n\t\tDestination IBAN: " + destinationIBAN + "\n\t\tAmount: " + amount + "\n\t\tCurrency: " + currency + "\n\t\tDate: " + sdf.format(date) + "\n";
     }
 }

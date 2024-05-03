@@ -62,7 +62,6 @@ public interface CSVManager {
                 SavingsAccount account;
                 temporary = line.split(",");
                 if (temporary[0].equals(phoneNumber)) {
-    //            SavingsAccount savingsAccount2 = new SavingsAccount("RO1234567890123456789012", 1000, Currencies.RON, 0.1f, new SimpleDateFormat("dd").parse("2021-06-01"));
                     account = new SavingsAccount(temporary[1], Float.parseFloat(temporary[2]), Currencies.valueOf(temporary[3]), Float.parseFloat(temporary[4]), new SimpleDateFormat("dd").parse(temporary[5]));
                     accounts.add(account);
                 }
@@ -70,6 +69,30 @@ public interface CSVManager {
             fr.close();
             br.close();
             return accounts;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    static ArrayList<Transaction> readTransactionCSV(String path, String phoneNumber) {
+        try {
+            ArrayList<Transaction> transactions = new ArrayList<>();
+            File file = new File(path);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            while ((line = br.readLine()) != null) {
+                Transaction transaction;
+                temporary = line.split(",");
+                if (temporary[0].equals(phoneNumber) || temporary[1].equals(phoneNumber)) {
+                    transaction = new Transaction(temporary[2], temporary[3], Float.parseFloat(temporary[4]), temporary[5], new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(temporary[6]));
+                    transactions.add(transaction);
+                }
+            }
+            fr.close();
+            br.close();
+            return transactions;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -109,6 +132,29 @@ public interface CSVManager {
             while ((line = br.readLine()) != null) {
                 temporary = line.split(",");
                 if (temporary[1].equals(account.getIBAN())) {
+                    fr.close();
+                    br.close();
+                    return false;
+                }
+            }
+            fr.close();
+            br.close();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    static boolean verifyTransactionNotInCSV(String path, Transaction transaction) {
+        try {
+            File file = new File(path);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            while ((line = br.readLine()) != null) {
+                temporary = line.split(",");
+                if (temporary[2].equals(transaction.getSourceIBAN()) && temporary[3].equals(transaction.getDestinationIBAN())) {
                     fr.close();
                     br.close();
                     return false;
@@ -192,6 +238,31 @@ public interface CSVManager {
             }
             bw.write(phoneNumber + "," + account.getIBAN() + "," + account.getBalance() + "," + account.getCurrency() + "," + account.getInterestRate() + "," + new SimpleDateFormat("yyyy-MM-dd").format(account.getDayOfPayment()));
             System.out.println("Savings account added successfully!");
+            bw.close();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    static void addTransactionCSV(String path, String phoneNumber1, String phoneNumber2, Transaction transaction) {
+        try {
+            File file = new File(path);
+            FileWriter fw = new FileWriter(file, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            if (file.length() != 0) {
+                if (verifyTransactionNotInCSV(path, transaction)) {
+                    bw.newLine();
+                } else {
+                    bw.close();
+                    fw.close();
+                    return;
+                }
+            }
+            bw.write(phoneNumber1 + "," + phoneNumber2 + "," + transaction.getSourceIBAN() + "," + transaction.getDestinationIBAN() + "," + transaction.getAmount() + "," + transaction.getCurrency() + "," + new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").format(transaction.getDate()));
+            System.out.println("Transaction added successfully!");
             bw.close();
             fw.close();
         } catch (IOException e) {
@@ -288,6 +359,34 @@ public interface CSVManager {
             e.printStackTrace();
         }
     }
+    static void updateTransactionCSV(String path, Transaction transaction) {
+        try {
+            File file = new File(path);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            String data = "";
+            while ((line = br.readLine()) != null) {
+                temporary = line.split(",");
+                if (temporary[2].equals(transaction.getSourceIBAN()) || temporary[3].equals(transaction.getDestinationIBAN()))
+                    data += temporary[0] + "," + temporary[1] + "," + transaction.getSourceIBAN() + "," + transaction.getDestinationIBAN() + "," + transaction.getAmount() + "," + transaction.getCurrency() + "," + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(transaction.getDate()) + "\n";
+                else
+                    data += line + "\n";
+            }
+            data = data.substring(0, data.length() - 1);
+            fr.close();
+            br.close();
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(data);
+            System.out.println("Transaction updated successfully!");
+            bw.close();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     static void deleteClientCSV(String path, Client client) {
         try {
@@ -342,6 +441,37 @@ public interface CSVManager {
                     System.out.println("Savings account deleted successfully!");
                 else
                     System.out.println("Account deleted successfully!");
+            }
+            fr.close();
+            br.close();
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(data);
+            bw.close();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    static void deleteTransactionCSV(String path, Transaction transaction) {
+        try {
+            boolean deleted = false;
+            File file = new File(path);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            String data = "";
+            while ((line = br.readLine()) != null) {
+                temporary = line.split(",");
+                if (!(temporary[2].equals(transaction.getSourceIBAN()) && temporary[3].equals(transaction.getDestinationIBAN())))
+                    data += line + "\n";
+                else
+                    deleted = true;
+            }
+            data = data.substring(0, data.length() - 1);
+            if (deleted) {
+                System.out.println("Transaction deleted successfully!");
             }
             fr.close();
             br.close();
