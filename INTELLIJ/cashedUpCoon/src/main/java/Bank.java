@@ -52,4 +52,8 @@ public class Bank {
     public void updateClient(Client client) {
         clients.put(client.getPhoneNumber(), client);
     }
+
+    public void initiateClients() {
+        clients = CSVManager.readClientCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/clients_test.csv");
+    }
 }
