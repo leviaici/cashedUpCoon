@@ -62,6 +62,6 @@ public class Bank {
 
     public void initiateDirectories() {
         for (String key : clients.keySet())
-            CSVManager.createDirectory(clients.get(key));
+            CSVManager.createClientMainDirectory(clients.get(key));
     }
 }
