@@ -708,7 +708,7 @@ public interface CSVManager {
         else
             System.out.println("Client directory already exists.");
     }
-    static void createClientSubDirectories(Client client) {
+    static void createClientFiles(Client client) {
         try {
             String path = "/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/";
             String[] files = {"accounts.csv", "savings_accounts.csv", "transactions.csv", "debit_cards.csv", "credit_cards.csv", "account_details.csv"};
@@ -748,7 +748,6 @@ public interface CSVManager {
         } else
             System.out.println("Client directory does not exist.");
     }
-
     static void initiateDirectories(String path) {
         HashMap<String, Client> clients = readClientCSV(path);
         for (String key : clients.keySet()) {
@@ -763,7 +762,7 @@ public interface CSVManager {
             filePath = filePath + client.getPhoneNumber() + "/";
 
             CSVManager.createClientMainDirectory(client);   // creating main directory of client
-            CSVManager.createClientSubDirectories(client);  // creating subdirectories of client (accounts, transactions, cards)
+            CSVManager.createClientFiles(client);  // creating subdirectories of client (accounts, transactions, cards)
             for (Account account : accounts)
                 CSVManager.addAccountCSV(filePath + "accounts.csv", client.getPhoneNumber(), account);
             for (SavingsAccount account : savingsAccounts)
