@@ -332,7 +332,7 @@ public interface CSVManager {
                     return;
                 }
             }
-            bw.write(phoneNumber1 + "," + phoneNumber2 + "," + transaction.getSourceIBAN() + "," + transaction.getDestinationIBAN() + "," + transaction.getAmount() + "," + transaction.getCurrency() + "," + new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").format(transaction.getDate()));
+            bw.write(phoneNumber1 + "," + phoneNumber2 + "," + transaction.getSourceIBAN() + "," + transaction.getDestinationIBAN() + "," + transaction.getAmount() + "," + transaction.getCurrency() + "," + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(transaction.getDate()));
             System.out.println("Transaction added successfully!");
             bw.close();
             fw.close();
@@ -696,85 +696,34 @@ public interface CSVManager {
         }
     }
 
-    static void createClientMainDirectory(Client client) {
-        String path = "/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/";
-        File directory = new File(path);
-
-        if (!directory.exists())
-            if (directory.mkdir())
-                System.out.println("Client directory created successfully!");
-            else
-                System.out.println("Failed to create client directory.");
-        else
-            System.out.println("Client directory already exists.");
-    }
-    static void createClientFiles(Client client) {
+    static HashMap<Integer, String> getPhoneNumberFromTransaction(String path, Transaction transaction, String phoneNumber) {
         try {
-            String path = "/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/";
-            String[] files = {"accounts.csv", "savings_accounts.csv", "transactions.csv", "debit_cards.csv", "credit_cards.csv", "account_details.csv"};
-            File directory = new File(path);
-            if(!directory.exists())
-                createClientMainDirectory(client);
-            for (String file : files) {
-                directory = new File(path + file);
-                if (!directory.exists())
-                    if (directory.createNewFile())
-                        System.out.println("Client " + file + " directory created successfully!");
-                    else
-                        System.out.println("Failed to create client " + file + " directory.");
-                else
-                    System.out.println("Client " + file + " directory already exists.");
+            File file = new File(path);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            while ((line = br.readLine()) != null) {
+                temporary = line.split(",");
+                if (temporary[2].equals(transaction.getSourceIBAN()) && temporary[3].equals(transaction.getDestinationIBAN()))
+                    if (temporary[0].equals(phoneNumber)) {
+                        String[] finalTemporary = temporary;
+                        return new HashMap<>() {{
+                            put(1, finalTemporary[1]);
+                        }};
+                    } else {
+                        String[] finalTemporary = temporary;
+                        return new HashMap<>() {{
+                            put(0, finalTemporary[0]);
+                        }};
+                    }
             }
+            fr.close();
+            br.close();
+            return null;
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-    static void deleteClientMainDirectory(Client client) {
-        String path = "/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/";
-        File directory = new File(path);
-        String[] files = {"accounts.csv", "savings_accounts.csv", "transactions.csv", "debit_cards.csv", "credit_cards.csv", "account_details.csv"};
-        if (directory.exists()) {
-            for (String file : files) {
-                File fileToDelete = new File(path + file);
-                if (fileToDelete.delete())
-                    System.out.println("Client " + file + " directory deleted successfully!");
-                else
-                    System.out.println("Failed to delete client " + file + " directory.");
-            }
-            if (directory.delete())
-                System.out.println("Client directory deleted successfully!");
-            else
-                System.out.println("Failed to delete client directory.");
-        } else
-            System.out.println("Client directory does not exist.");
-    }
-    static void initiateDirectories(String path) {
-        HashMap<String, Client> clients = readClientCSV(path);
-        for (String key : clients.keySet()) {
-            Client client = clients.get(key);
-            String filePath = "/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/";
-            deleteClientMainDirectory(client);
-            ArrayList<Account> accounts = readAccountCSV(filePath + "accounts_test.csv", client.getPhoneNumber());
-            ArrayList<SavingsAccount> savingsAccounts = readSavingsAccountCSV(filePath + "savings_accounts_test.csv", client.getPhoneNumber());
-            ArrayList<Transaction> transactions = readTransactionCSV(filePath + "transactions_test.csv", client.getPhoneNumber());
-            ArrayList<CreditCard> creditCards = readCreditCardCSV(filePath + "credit_card_test.csv", client.getPhoneNumber());
-            ArrayList<DebitCard> debitCards = readDebitCardCSV(filePath + "debit_card_test.csv", client.getPhoneNumber());
-            filePath = filePath + client.getPhoneNumber() + "/";
-
-            CSVManager.createClientMainDirectory(client);   // creating main directory of client
-            CSVManager.createClientFiles(client);  // creating subdirectories of client (accounts, transactions, cards)
-            for (Account account : accounts)
-                CSVManager.addAccountCSV(filePath + "accounts.csv", client.getPhoneNumber(), account);
-            for (SavingsAccount account : savingsAccounts)
-                CSVManager.addSavingsAccountCSV(filePath + "savings_accounts.csv", client.getPhoneNumber(), account);
-            for (Transaction transaction : transactions)
-                CSVManager.addTransactionCSV(filePath + "transactions.csv", client.getPhoneNumber(), "", transaction);
-            for (CreditCard card : creditCards)
-                CSVManager.addCreditCardCSV(filePath + "credit_cards.csv", client.getPhoneNumber(), card);
-            for (DebitCard card : debitCards)
-                CSVManager.addDebitCardCSV(filePath + "debit_cards.csv", client.getPhoneNumber(), card);
-
-            CSVManager.addClientCSV(filePath + "account_details.csv", client);
+            return null;
         }
     }
 }
