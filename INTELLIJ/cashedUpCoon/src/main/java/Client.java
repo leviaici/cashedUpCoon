@@ -137,6 +137,13 @@ public class Client {
         return accounts;
     }
 
+    public Account getAccount(String IBAN) {
+        for (Account account : accounts)
+            if (account.getIBAN().equals(IBAN))
+                return account;
+        return null;
+    }
+
     public void setAccounts(ArrayList<Account> accounts) {
         this.accounts = accounts;
     }

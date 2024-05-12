@@ -8,10 +8,10 @@ public class Transaction {
     private String sourceIBAN;
     private String destinationIBAN;
     private float amount;
-    private String currency;
+    private Currencies currency;
     private Date date;
 
-    public Transaction(String sourceIBAN, String destinationIBAN, float amount, String currency, Date date) {
+    public Transaction(String sourceIBAN, String destinationIBAN, float amount, Currencies currency, Date date) {
         this.id = idCounter++;
         this.sourceIBAN = sourceIBAN;
         this.destinationIBAN = destinationIBAN;
@@ -20,7 +20,7 @@ public class Transaction {
         this.date = date;
     }
 
-    public Transaction(String sourceIBAN, String destinationIBAN, float amount, String currency) {
+    public Transaction(String sourceIBAN, String destinationIBAN, float amount, Currencies currency) {
         this.id = idCounter++;
         this.sourceIBAN = sourceIBAN;
         this.destinationIBAN = destinationIBAN;
@@ -65,11 +65,11 @@ public class Transaction {
         this.amount = amount;
     }
 
-    public String getCurrency() {
+    public Currencies getCurrency() {
         return currency;
     }
 
-    public void setCurrency(String currency) {
+    public void setCurrency(Currencies currency) {
         this.currency = currency;
     }
 

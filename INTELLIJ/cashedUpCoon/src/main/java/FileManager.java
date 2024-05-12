@@ -94,4 +94,10 @@ public interface FileManager {
             CSVManager.addClientCSV(filePath + "account_details.csv", client);
         }
     }
+    static void initiateDirectory(Client client) {
+        String path = "/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/";
+        FileManager.createClientMainDirectory(client);
+        FileManager.createClientFiles(client);
+        CSVManager.addClientCSV(path + "account_details.csv", client);
+    }
 }

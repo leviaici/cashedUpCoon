@@ -14,6 +14,11 @@ public class CreditCard extends Card {
         this.creditLimitPerTransaction = creditLimitPerTransaction;
     }
 
+    public CreditCard(float creditLimitPerTransaction) {
+        super();
+        this.creditLimitPerTransaction = creditLimitPerTransaction;
+    }
+
     public float getCreditLimitPerTransaction() {
         return creditLimitPerTransaction;
     }

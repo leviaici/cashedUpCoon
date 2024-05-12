@@ -1,6 +1,8 @@
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Random;
 
 abstract class Card {
     private String number;
@@ -19,6 +21,41 @@ abstract class Card {
         this.cvv = cvv;
         this.expirationDate = expirationDate;
         this.blocked = blocked;
+    }
+
+    public Card() {
+        this.number = generateRandomNumber();
+        this.cvv = generateRandomCVV();
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.YEAR, 4);
+        this.expirationDate = calendar.getTime();
+        this.blocked = false;
+    }
+
+    public String generateRandomNumber() {
+        String numbers = "0123456789";
+        Random random = new Random();
+        StringBuilder number = new StringBuilder();
+
+        for (int i = 0; i < 16; i++)
+            number.append(numbers.charAt(random.nextInt(numbers.length())));
+
+        DebitCard debitCard = new DebitCard(number.toString(), "123", new Date(), false, 1000);
+        if (CSVManager.verifyCardNotInCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/credit_card_test.csv",debitCard) && CSVManager.verifyCardNotInCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/debit_card_test.csv",debitCard))
+            return number.toString();
+        else
+            return generateRandomNumber();
+    }
+
+    public String generateRandomCVV() {
+        String numbers = "0123456789";
+        Random random = new Random();
+        StringBuilder cvv = new StringBuilder();
+
+        for (int i = 0; i < 3; i++)
+            cvv.append(numbers.charAt(random.nextInt(numbers.length())));
+
+        return cvv.toString();
     }
 
     public String getNumber() {

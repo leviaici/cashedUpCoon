@@ -86,7 +86,7 @@ public interface CSVManager {
                 Transaction transaction;
                 temporary = line.split(",");
                 if (temporary[0].equals(phoneNumber) || temporary[1].equals(phoneNumber)) {
-                    transaction = new Transaction(temporary[2], temporary[3], Float.parseFloat(temporary[4]), temporary[5], new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(temporary[6]));
+                    transaction = new Transaction(temporary[2], temporary[3], Float.parseFloat(temporary[4]), Currencies.valueOf(temporary[5]), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(temporary[6]));
                     transactions.add(transaction);
                 }
             }
@@ -202,7 +202,7 @@ public interface CSVManager {
             String[] temporary;
             while ((line = br.readLine()) != null) {
                 temporary = line.split(",");
-                if (temporary[2].equals(transaction.getSourceIBAN()) && temporary[3].equals(transaction.getDestinationIBAN())) {
+                if (temporary[2].equals(transaction.getSourceIBAN()) && temporary[3].equals(transaction.getDestinationIBAN()) && temporary[6].equals(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(transaction.getDate()))) {
                     fr.close();
                     br.close();
                     return false;
@@ -717,6 +717,49 @@ public interface CSVManager {
                             put(0, finalTemporary[0]);
                         }};
                     }
+            }
+            fr.close();
+            br.close();
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    static String getPhoneNumberFromIBAN(String IBAN) {
+        try {
+            File file = new File("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv");
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            while ((line = br.readLine()) != null) {
+                temporary = line.split(",");
+                if (temporary[1].equals(IBAN)) {
+                    return temporary[0];
+                }
+            }
+            fr.close();
+            br.close();
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    static Account getAccountFromIBAN(String IBAN) {
+        try {
+            File file = new File("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv");
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            while ((line = br.readLine()) != null) {
+                temporary = line.split(",");
+                if (temporary[1].equals(IBAN)) {
+                    return CSVManager.readAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv", temporary[0]).getFirst();
+                }
             }
             fr.close();
             br.close();

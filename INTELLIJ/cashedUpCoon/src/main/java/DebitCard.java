@@ -14,6 +14,11 @@ public class DebitCard extends Card {
         this.withdrawLimitPerTransaction = withdrawLimitPerTransaction;
     }
 
+    public DebitCard(int withdrawLimitPerTransaction) {
+        super();
+        this.withdrawLimitPerTransaction = withdrawLimitPerTransaction;
+    }
+
     public int getWithdrawLimitPerTransaction() {
         return withdrawLimitPerTransaction;
     }

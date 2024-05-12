@@ -71,7 +71,7 @@ public class Account {
     public boolean transferFunds(Account destination, float amount) {
         if (balance < amount)
             return false;
-        addTransaction(new Transaction(IBAN, destination.getIBAN(), amount, currency.toString()));
+        addTransaction(new Transaction(IBAN, destination.getIBAN(), amount, currency));
         withdrawFunds(amount);
         destination.addFunds(amount);
         return true;
