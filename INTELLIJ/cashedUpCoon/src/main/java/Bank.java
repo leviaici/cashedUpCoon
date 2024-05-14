@@ -1,6 +1,9 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 public class Bank {
     private static Bank instance = null;
@@ -65,27 +68,28 @@ public class Bank {
         menu = getUserChoice();
     }
 
-    private void createClientAccountMenu() {
+    private void createClientAccountMenu() throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Create Account Menu:");
         System.out.println("Name: ");
-        String name = scanner.next();
+        String name = reader.readLine();
         System.out.println("Email: ");
-        String email = scanner.next();
+        String email = reader.readLine();
         System.out.println("Phone Number: ");
-        String phoneNumber = scanner.next();
+        String phoneNumber = reader.readLine();
         System.out.println("Address: ");
-        String address = scanner.next();
+        String address = reader.readLine().replace(",", ";");
         System.out.println("Password: ");
         System.out.println("Do you want to generate a password? (Y/N)");
-        String choice = scanner.next();
+        String choice = reader.readLine();
         String password;
-        if (choice.equalsIgnoreCase("Y")) {
-            password = new Client(address, phoneNumber, email, name).generatePassword();
-        } else {
-            password = scanner.next();
-        }
+        if (choice.equalsIgnoreCase("Y"))
+            password = Client.generatePassword();
+        else
+            password = reader.readLine();
         Client newClient = new Client(name, email, phoneNumber, address, password);
         addClient(newClient);
+        CSVManager.addClientCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/clients_test.csv", newClient);
         FileManager.initiateDirectory(newClient);
         System.out.println("Account created successfully.");
         menu = 0;
@@ -123,10 +127,10 @@ public class Bank {
         System.out.println("2. View Cards");
         System.out.println("3. View Transactions");
         System.out.println("4. Transfer Money");
-        System.out.println("5. Apply for Credit Card"); // to be tested
-        System.out.println("6. Apply for Debit Card"); // to be tested
-//        System.out.println("7. Apply for Savings Account");
-//        System.out.println("8. Open New Account");
+        System.out.println("5. Apply for Credit Card");
+        System.out.println("6. Apply for Debit Card");
+        System.out.println("7. Apply for Savings Account");
+        System.out.println("8. Open New Account");
         System.out.println("9. View Client Account Details");
         System.out.println("0. Exit");
         System.out.print("Enter your choice: ");
@@ -194,6 +198,11 @@ public class Bank {
     }
 
     private void transferMoney() {
+        if (client.getAccounts().isEmpty()) {
+            System.out.println("No accounts found. Please create an account first.");
+            menu = 3;
+            return;
+        }
         System.out.println("Transfer Money:");
         System.out.println("From Account: ");
         String fromIBAN = scanner.next();
@@ -235,6 +244,7 @@ public class Bank {
         CreditCard creditCard = new CreditCard(creditLimit);
         client.addCard(creditCard);
         CSVManager.addCreditCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/credit_cards.csv", client.getPhoneNumber(), creditCard);
+        CSVManager.addCreditCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/credit_cards_test.csv", client.getPhoneNumber(), creditCard);
         System.out.println("Credit Card application successful. Here are your card details:");
         System.out.println(creditCard);
         menu = 3;
@@ -247,8 +257,35 @@ public class Bank {
         DebitCard debitCard = new DebitCard(withdrawalLimit);
         client.addCard(debitCard);
         CSVManager.addDebitCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/debit_cards.csv", client.getPhoneNumber(), debitCard);
+        CSVManager.addDebitCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/debit_cards_test.csv", client.getPhoneNumber(), debitCard);
         System.out.println("Debit Card application successful. Here are your card details:");
         System.out.println(debitCard);
+        menu = 3;
+    }
+
+    private void applyForSavingsAccount() {
+        System.out.println("Apply for Savings Account:");
+        System.out.println("Currency (RON, EUR, USD, GBP):");
+        Currencies currency = Currencies.valueOf(scanner.next().toUpperCase());
+        SavingsAccount savingsAccount = new SavingsAccount(currency);
+        client.addAccount(savingsAccount);
+        CSVManager.addSavingsAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/savings_accounts.csv", client.getPhoneNumber(), savingsAccount);
+        CSVManager.addSavingsAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/savings_accounts_test.csv", client.getPhoneNumber(), savingsAccount);
+        System.out.println("Savings Account application successful. Here are your account details:");
+        System.out.println(savingsAccount);
+        menu = 3;
+    }
+
+    private void openNewAccount() {
+        System.out.println("Open New Account:");
+        System.out.println("Currency (RON, EUR, USD, GBP):");
+        Currencies currency = Currencies.valueOf(scanner.next().toUpperCase());
+        Account account = new Account(currency);
+        client.addAccount(account);
+        CSVManager.addAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/accounts.csv", client.getPhoneNumber(), account);
+        CSVManager.addAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv", client.getPhoneNumber(), account);
+        System.out.println("Account opened successfully. Here are your account details:");
+        System.out.println(account);
         menu = 3;
     }
 
@@ -273,7 +310,11 @@ public class Bank {
                     loginMenu();
                     break;
                 case 2:
-                    createClientAccountMenu(); // to be tested
+                    try {
+                        createClientAccountMenu();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case 3:
                     clientAccountMenu();
@@ -296,12 +337,12 @@ public class Bank {
                 case 9:
                     applyForDebitCard();
                     break;
-//                case 10:
-//                    applyForSavingsAccount();
-//                    break;
-//                case 11:
-//                    openNewAccount();
-//                    break;
+                case 10:
+                    applyForSavingsAccount();
+                    break;
+                case 11:
+                    openNewAccount();
+                    break;
                 case 12:
                     viewClientAccountDetails();
                     break;

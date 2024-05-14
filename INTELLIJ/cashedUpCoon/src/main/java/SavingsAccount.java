@@ -17,6 +17,21 @@ public class SavingsAccount extends Account {
         this.dayOfPayment = dayOfPayment;
     }
 
+    public SavingsAccount(float balance, Currencies currency, float interestRate) {
+        super(balance, currency);
+        this.interestRate = interestRate;
+    }
+
+    public SavingsAccount(Currencies currency, float interestRate) {
+        super(currency);
+        this.interestRate = interestRate;
+    }
+
+    public SavingsAccount(Currencies currency) {
+        super(currency);
+        this.interestRate = 1.3f;
+    }
+
     public float getInterestRate() {
         return interestRate;
     }

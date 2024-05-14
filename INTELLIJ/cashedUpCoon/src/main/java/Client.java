@@ -38,7 +38,7 @@ public class Client {
         this.password = generatePassword();
     }
 
-    public String generatePassword() {
+    public static String generatePassword() {
         String lowercase = "abcdefghijklmnopqrstuvwxyz";
         String uppercase = lowercase.toUpperCase();
         String numbers = "0123456789";

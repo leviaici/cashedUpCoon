@@ -20,6 +20,18 @@ public class Account {
         this.currency = currency;
     }
 
+    public Account(float balance, Currencies currency) {
+        this.IBAN = generateIBAN(currency);
+        this.balance = balance;
+        this.currency = currency;
+    }
+
+    public Account(Currencies currency) {
+        this.IBAN = generateIBAN(currency);
+        this.balance = 0.0f;
+        this.currency = currency;
+    }
+
     public String getIBAN() {
         return IBAN;
     }
@@ -75,6 +87,19 @@ public class Account {
         withdrawFunds(amount);
         destination.addFunds(amount);
         return true;
+    }
+
+    private String generateIBAN(Currencies currency) {
+        String prefix = currency.toString().substring(0, 2) + "13" + "CUCB";
+        String toBeIBAN = prefix;
+        for (int i = 0; i < 14; i++)
+            toBeIBAN += (int) (Math.random() * 10);
+        while (CSVManager.getAccountFromIBAN(toBeIBAN) != null) {
+            toBeIBAN = prefix;
+            for (int i = 0; i < 14; i++)
+                toBeIBAN += (int) (Math.random() * 10);
+        }
+        return toBeIBAN;
     }
 
     @Override
