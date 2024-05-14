@@ -100,4 +100,16 @@ public interface FileManager {
         FileManager.createClientFiles(client);
         CSVManager.addClientCSV(path + "account_details.csv", client);
     }
+    static void createAuditFile() {
+        String path = "/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/audit_log.csv";
+        File directory = new File(path);
+
+        if (!directory.exists())
+            if (directory.mkdir())
+                System.out.println("Audit log file created successfully!");
+            else
+                System.out.println("Failed to create audit log file.");
+        else
+            System.out.println("Audit log file already exists.");
+    }
 }

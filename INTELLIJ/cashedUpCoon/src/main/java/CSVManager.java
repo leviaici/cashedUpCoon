@@ -391,6 +391,8 @@ public interface CSVManager {
         }
     }
 
+//    static void write_log
+
     static void updateClientCSV(String path, Client client) {
         try {
             File file = new File(path);
@@ -747,7 +749,6 @@ public interface CSVManager {
             return null;
         }
     }
-
     static Account getAccountFromIBAN(String IBAN) {
         try {
             File file = new File("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv");
