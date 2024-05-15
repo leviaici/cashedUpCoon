@@ -138,6 +138,7 @@ public class Bank {
         System.out.println("7. Apply for Savings Account");
         System.out.println("8. Open New Account");
         System.out.println("9. View Client Account Details");
+        System.out.println("10. Save Money");
         System.out.println("0. Exit");
         System.out.print("Enter your choice: ");
         menu = getUserChoice();
@@ -168,6 +169,9 @@ public class Bank {
                 break;
             case 9:
                 menu = 12;
+                break;
+            case 10:
+                menu = 13;
                 break;
             case 0:
                 menu = -1;
@@ -224,6 +228,7 @@ public class Bank {
         if (destination != null) {
             if (!client.getAccount(fromIBAN).transferFunds(destination, amount)) {
                 System.out.println("Insufficient funds. Please try again.");
+                Audit.writeLog(Audit.Type.TRANSACTION_CREATION, false);
                 menu = 3;
                 return;
             }
@@ -235,11 +240,13 @@ public class Bank {
                 }
             } catch (AccountIsSavingsAccount e) {
                 e.printStackTrace();
+                Audit.writeLog(Audit.Type.TRANSACTION_CREATION, false);
                 menu = 3;
                 return;
             }
             if (!client.getAccount(fromIBAN).transferFunds(new Account(toIBAN, client.getAccount(fromIBAN).getCurrency()), amount)) {
                 System.out.println("Insufficient funds. Please try again.");
+                Audit.writeLog(Audit.Type.TRANSACTION_CREATION, false);
                 menu = 3;
                 return;
             }
@@ -321,6 +328,44 @@ public class Bank {
         menu = 3;
     }
 
+    private void saveMoney() {
+        if (client.getAccounts().isEmpty()) {
+            System.out.println("No accounts found. Please create an account first.");
+            menu = 3;
+            return;
+        }
+        System.out.println("Save Money:");
+        System.out.println("Select Account from which to save money: ");
+        client.printAccountIBANs();
+        String fromIBAN = scanner.next();
+        fromIBAN = client.getAccounts().get(Integer.parseInt(fromIBAN) - 1).getIBAN();
+        System.out.println(fromIBAN + " selected.");
+        System.out.println("Amount: ");
+        float amount = scanner.nextFloat();
+        if (client.getAccount(fromIBAN).getBalance() < amount) {
+            System.out.println("Insufficient funds. Please try again.");
+            Audit.writeLog(Audit.Type.SAVE_MONEY, false);
+            menu = 3;
+            return;
+        }
+        System.out.println("Select Account to which to save money: ");
+        client.printSavingsAccountIBANs();
+        String toIBAN = scanner.next();
+        toIBAN = client.getSavingsAccounts().get(Integer.parseInt(toIBAN) - 1).getIBAN();
+        System.out.println(toIBAN + " selected.");
+        client.getAccount(fromIBAN).transferFunds(client.getSavingsAccount(toIBAN), amount);
+        CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv", client.getAccount(fromIBAN));
+        CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/accounts.csv", client.getAccount(fromIBAN));
+        CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/savings_accounts_test.csv", client.getSavingsAccount(toIBAN));
+        CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/savings_accounts.csv", client.getSavingsAccount(toIBAN));
+        Transaction transaction = new Transaction(fromIBAN, toIBAN, amount, client.getAccount(fromIBAN).getCurrency());
+        CSVManager.addTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/transactions_test.csv", client.getPhoneNumber(), client.getPhoneNumber(), transaction);
+        CSVManager.addTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/transactions.csv", client.getPhoneNumber(), client.getPhoneNumber(), transaction);
+        System.out.println("Transaction successful.");
+        Audit.writeLog(Audit.Type.SAVE_MONEY, true);
+        menu = 3;
+    }
+
     public void run() {
         FileManager.initiateDirectories("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/clients_test.csv");
         initiateClients();
@@ -371,6 +416,9 @@ public class Bank {
                     break;
                 case 12:
                     viewClientAccountDetails();
+                    break;
+                case 13:
+                    saveMoney();
                     break;
                 default:
                     System.out.println("Invalid choice. Please try again.");

@@ -14,7 +14,8 @@ public interface Audit {
         CLIENT_LOGIN, CLIENT_LOGOUT,
         CREDIT_CARD_CREATION, CREDIT_CARD_UPDATE, CREDIT_CARD_DELETION, CREDIT_CARD_READ,
         DEBIT_CARD_CREATION, DEBIT_CARD_UPDATE, DEBIT_CARD_DELETION, DEBIT_CARD_READ,
-        CARD_READ
+        CARD_READ,
+        SAVE_MONEY
     }
 
     static void writeLog(Type log, Boolean success) {

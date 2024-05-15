@@ -95,6 +95,12 @@ public class Account {
         return true;
     }
 
+    public void saveMoney(SavingsAccount destination, float amount) {
+        addTransaction(new Transaction(IBAN, destination.getIBAN(), amount, currency));
+        withdrawFunds(amount);
+        destination.addFunds(amount);
+    }
+
     private String generateIBAN(Currencies currency) {
         String prefix = currency.toString().substring(0, 2) + "13" + "CUCB";
         String toBeIBAN = prefix;

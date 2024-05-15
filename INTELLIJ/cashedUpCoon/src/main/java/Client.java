@@ -137,6 +137,14 @@ public class Client {
         return accounts;
     }
 
+    public ArrayList<SavingsAccount> getSavingsAccounts() {
+        ArrayList<SavingsAccount> savingsAccounts = new ArrayList<>();
+        for (Account account : accounts)
+            if (account instanceof SavingsAccount)
+                savingsAccounts.add((SavingsAccount) account);
+        return savingsAccounts;
+    }
+
     public Account getAccount(String IBAN) {
         for (Account account : accounts)
             if (account.getIBAN().equals(IBAN))
