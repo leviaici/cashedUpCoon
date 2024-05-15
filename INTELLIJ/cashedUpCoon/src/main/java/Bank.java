@@ -139,46 +139,16 @@ public class Bank {
         System.out.println("8. Open New Account");
         System.out.println("9. View Client Account Details");
         System.out.println("10. Save Money");
+        System.out.println("11. Transfer Money from Savings Account");
         System.out.println("0. Exit");
         System.out.print("Enter your choice: ");
-        menu = getUserChoice();
-        switch (menu) {
-            case 1:
-                menu = 4;
-                break;
-            case 2:
-                menu = 5;
-                break;
-            case 3:
-                menu = 6;
-                break;
-            case 4:
-                menu = 7;
-                break;
-            case 5:
-                menu = 8;
-                break;
-            case 6:
-                menu = 9;
-                break;
-            case 7:
-                menu = 10;
-                break;
-            case 8:
-                menu = 11;
-                break;
-            case 9:
-                menu = 12;
-                break;
-            case 10:
-                menu = 13;
-                break;
-            case 0:
-                menu = -1;
-                break;
-            default:
-                clientAccountMenu();
-                System.out.println("Invalid choice. Please try again.");
+        menu = getUserChoice() + 3;
+        if (menu == 3)
+            menu = -1;
+        else
+        if (menu > 14) {
+            clientAccountMenu();
+            System.out.println("Invalid choice. Please try again.");
         }
     }
 
@@ -356,13 +326,53 @@ public class Bank {
         client.getAccount(fromIBAN).transferFunds(client.getSavingsAccount(toIBAN), amount);
         CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv", client.getAccount(fromIBAN));
         CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/accounts.csv", client.getAccount(fromIBAN));
-        CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/savings_accounts_test.csv", client.getSavingsAccount(toIBAN));
-        CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/savings_accounts.csv", client.getSavingsAccount(toIBAN));
+        CSVManager.updateSavingsAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/savings_accounts_test.csv", client.getSavingsAccount(toIBAN));
+        CSVManager.updateSavingsAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/savings_accounts.csv", client.getSavingsAccount(toIBAN));
         Transaction transaction = new Transaction(fromIBAN, toIBAN, amount, client.getAccount(fromIBAN).getCurrency());
         CSVManager.addTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/transactions_test.csv", client.getPhoneNumber(), client.getPhoneNumber(), transaction);
         CSVManager.addTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/transactions.csv", client.getPhoneNumber(), client.getPhoneNumber(), transaction);
         System.out.println("Transaction successful.");
         Audit.writeLog(Audit.Type.SAVE_MONEY, true);
+        menu = 3;
+    }
+
+    private void transferMoneyFromSavingsAccount() {
+        if (client.getSavingsAccounts().isEmpty()) {
+            System.out.println("No savings accounts found. Please create a savings account first.");
+            Audit.writeLog(Audit.Type.TRANSACTION_CREATION, false);
+            menu = 3;
+            return;
+        }
+        System.out.println("Transfer Money from Savings Account:");
+        System.out.println("Select Savings Account: ");
+        client.printSavingsAccountIBANs();
+        String fromIBAN = scanner.next();
+        fromIBAN = client.getSavingsAccounts().get(Integer.parseInt(fromIBAN) - 1).getIBAN();
+        System.out.println(fromIBAN + " selected.");
+        System.out.println("Amount: ");
+        float amount = scanner.nextFloat();
+        System.out.println("To Account: ");
+        client.printAccountIBANs();
+        String index = scanner.next();
+        Account destination = client.getAccounts().get(Integer.parseInt(index) - 1);
+        System.out.println(destination.getIBAN() + " selected.");
+        if (!client.getSavingsAccount(fromIBAN).transferFunds(destination, amount)) {
+            System.out.println("Insufficient funds. Please try again.");
+            Audit.writeLog(Audit.Type.TRANSACTION_CREATION, false);
+            menu = 3;
+            return;
+        }
+        Currencies currency = client.getSavingsAccount(fromIBAN).getCurrency();
+        Transaction transaction = new Transaction(fromIBAN, destination.getIBAN(), amount, currency);
+        destination.addTransaction(transaction);
+        CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv", destination);
+        CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/accounts.csv", destination);
+        CSVManager.updateSavingsAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/savings_accounts.csv", client.getSavingsAccount(fromIBAN));
+        CSVManager.updateSavingsAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/savings_accounts_test.csv", client.getSavingsAccount(fromIBAN));
+        CSVManager.addTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/transactions_test.csv", client.getPhoneNumber(), client.getPhoneNumber(), transaction);
+        CSVManager.addTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/transactions.csv", client.getPhoneNumber(), client.getPhoneNumber(), transaction);
+        System.out.println("Transaction successful.");
+        Audit.writeLog(Audit.Type.TRANSACTION_CREATION, true);
         menu = 3;
     }
 
@@ -419,6 +429,9 @@ public class Bank {
                     break;
                 case 13:
                     saveMoney();
+                    break;
+                case 14:
+                    transferMoneyFromSavingsAccount();
                     break;
                 default:
                     System.out.println("Invalid choice. Please try again.");

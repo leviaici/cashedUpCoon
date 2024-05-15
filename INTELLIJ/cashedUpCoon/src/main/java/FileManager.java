@@ -78,14 +78,11 @@ public interface FileManager {
                 CSVManager.addSavingsAccountCSV(filePath + "savings_accounts.csv", client.getPhoneNumber(), account);
             for (Transaction transaction : transactions) {
                 HashMap<Integer, String> otherPhoneNumber = CSVManager.getPhoneNumberFromTransaction("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/transactions_test.csv", transaction, client.getPhoneNumber());
-                for (int index : otherPhoneNumber.keySet()) {
-                    if (index == 1) {
+                for (int index : otherPhoneNumber.keySet())
+                    if (index == 1)
                         CSVManager.addTransactionCSV(filePath + "transactions.csv", client.getPhoneNumber(), otherPhoneNumber.get(index), transaction);
-                    } else {
+                    else
                         CSVManager.addTransactionCSV(filePath + "transactions.csv", otherPhoneNumber.get(index), client.getPhoneNumber(), transaction);
-                    }
-                }
-//                CSVManager.addTransactionCSV(filePath + "transactions.csv", client.getPhoneNumber(), "", transaction);
             }
             for (CreditCard card : creditCards)
                 CSVManager.addCreditCardCSV(filePath + "credit_cards.csv", client.getPhoneNumber(), card);
