@@ -20,9 +20,11 @@ public interface CSVManager {
             }
             fr.close();
             br.close();
+            Audit.writeLog(Audit.Type.CLIENT_READ, true);
             return clients;
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.CLIENT_READ, false);
             return null;
         }
     }
@@ -44,9 +46,11 @@ public interface CSVManager {
             }
             fr.close();
             br.close();
+            Audit.writeLog(Audit.Type.ACCOUNT_READ, true);
             return accounts;
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.ACCOUNT_READ, false);
             return null;
         }
     }
@@ -68,9 +72,11 @@ public interface CSVManager {
             }
             fr.close();
             br.close();
+            Audit.writeLog(Audit.Type.SAVINGS_ACCOUNT_READ, true);
             return accounts;
         } catch (Exception e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.SAVINGS_ACCOUNT_READ, false);
             return null;
         }
     }
@@ -92,9 +98,11 @@ public interface CSVManager {
             }
             fr.close();
             br.close();
+            Audit.writeLog(Audit.Type.TRANSACTION_READ, true);
             return transactions;
         } catch (Exception e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.TRANSACTION_READ, false);
             return null;
         }
     }
@@ -116,9 +124,11 @@ public interface CSVManager {
             }
             fr.close();
             br.close();
+            Audit.writeLog(Audit.Type.CREDIT_CARD_READ, true);
             return cards;
         } catch (Exception e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.CREDIT_CARD_READ, false);
             return null;
         }
     }
@@ -140,9 +150,11 @@ public interface CSVManager {
             }
             fr.close();
             br.close();
+            Audit.writeLog(Audit.Type.DEBIT_CARD_READ, true);
             return cards;
         } catch (Exception e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.DEBIT_CARD_READ, false);
             return null;
         }
     }
@@ -164,9 +176,11 @@ public interface CSVManager {
             }
             fr.close();
             br.close();
+            Audit.writeLog(Audit.Type.CLIENT_READ, true);
             return true;
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.CLIENT_READ, false);
             return false;
         }
     }
@@ -187,9 +201,11 @@ public interface CSVManager {
             }
             fr.close();
             br.close();
+            Audit.writeLog(Audit.Type.ACCOUNT_READ, true);
             return true;
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.ACCOUNT_READ, false);
             return false;
         }
     }
@@ -210,9 +226,11 @@ public interface CSVManager {
             }
             fr.close();
             br.close();
+            Audit.writeLog(Audit.Type.TRANSACTION_READ, true);
             return true;
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.TRANSACTION_READ, false);
             return false;
         }
     }
@@ -233,9 +251,11 @@ public interface CSVManager {
             }
             fr.close();
             br.close();
+            Audit.writeLog(Audit.Type.CARD_READ, true);
             return true;
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.CARD_READ, false);
             return false;
         }
     }
@@ -254,15 +274,18 @@ public interface CSVManager {
                 } else {
                     bw.close();
                     fw.close();
+                    Audit.writeLog(Audit.Type.CLIENT_CREATION, false);
                     return;
                 }
             }
             bw.write(client.getName() + "," + client.getEmail() + "," + client.getPhoneNumber() + "," + client.getAddress() + "," + client.getPassword());
             System.out.println("Client added successfully!");
+            Audit.writeLog(Audit.Type.CLIENT_CREATION, true);
             bw.close();
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.CLIENT_CREATION, false);
         }
     }
     static void addAccountCSV(String path, String phoneNumber, Account account) {
@@ -279,15 +302,18 @@ public interface CSVManager {
                 } else {
                     bw.close();
                     fw.close();
+                    Audit.writeLog(Audit.Type.ACCOUNT_CREATION, false);
                     return;
                 }
             }
             bw.write(phoneNumber + "," + account.getIBAN() + "," + account.getBalance() + "," + account.getCurrency());
             System.out.println("Account added successfully!");
+            Audit.writeLog(Audit.Type.ACCOUNT_CREATION, true);
             bw.close();
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.ACCOUNT_CREATION, false);
         }
     }
     static void addSavingsAccountCSV(String path, String phoneNumber, SavingsAccount account) {
@@ -304,15 +330,18 @@ public interface CSVManager {
                 } else {
                     bw.close();
                     fw.close();
+                    Audit.writeLog(Audit.Type.SAVINGS_ACCOUNT_CREATION, false);
                     return;
                 }
             }
             bw.write(phoneNumber + "," + account.getIBAN() + "," + account.getBalance() + "," + account.getCurrency() + "," + account.getInterestRate() + "," + new SimpleDateFormat("yyyy-MM-dd").format(account.getDayOfPayment()));
             System.out.println("Savings account added successfully!");
+            Audit.writeLog(Audit.Type.SAVINGS_ACCOUNT_CREATION, true);
             bw.close();
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.SAVINGS_ACCOUNT_CREATION, false);
         }
     }
     static void addTransactionCSV(String path, String phoneNumber1, String phoneNumber2, Transaction transaction) {
@@ -329,15 +358,18 @@ public interface CSVManager {
                 } else {
                     bw.close();
                     fw.close();
+                    Audit.writeLog(Audit.Type.TRANSACTION_CREATION, false);
                     return;
                 }
             }
             bw.write(phoneNumber1 + "," + phoneNumber2 + "," + transaction.getSourceIBAN() + "," + transaction.getDestinationIBAN() + "," + transaction.getAmount() + "," + transaction.getCurrency() + "," + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(transaction.getDate()));
             System.out.println("Transaction added successfully!");
+            Audit.writeLog(Audit.Type.TRANSACTION_CREATION, true);
             bw.close();
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.TRANSACTION_CREATION, false);
         }
     }
     static void addCreditCardCSV(String path, String phoneNumber, CreditCard card) {
@@ -354,15 +386,18 @@ public interface CSVManager {
                 } else {
                     bw.close();
                     fw.close();
+                    Audit.writeLog(Audit.Type.CREDIT_CARD_CREATION, false);
                     return;
                 }
             }
             bw.write(phoneNumber + "," + card.getNumber() + "," + card.getCvv() + "," + new SimpleDateFormat("yyyy-MM").format(card.getExpirationDate()) + "," + card.getBlocked() + "," + card.getCreditLimitPerTransaction());
             System.out.println("Credit card added successfully!");
+            Audit.writeLog(Audit.Type.CREDIT_CARD_CREATION, true);
             bw.close();
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.CREDIT_CARD_CREATION, false);
         }
     }
     static void addDebitCardCSV(String path, String phoneNumber, DebitCard card) {
@@ -379,19 +414,20 @@ public interface CSVManager {
                 } else {
                     bw.close();
                     fw.close();
+                    Audit.writeLog(Audit.Type.DEBIT_CARD_CREATION, false);
                     return;
                 }
             }
             bw.write(phoneNumber + "," + card.getNumber() + "," + card.getCvv() + "," + new SimpleDateFormat("yyyy-MM").format(card.getExpirationDate()) + "," + card.getBlocked() + "," + card.getWithdrawLimitPerTransaction());
             System.out.println("Debit card added successfully!");
+            Audit.writeLog(Audit.Type.DEBIT_CARD_CREATION, true);
             bw.close();
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.DEBIT_CARD_CREATION, false);
         }
     }
-
-//    static void write_log
 
     static void updateClientCSV(String path, Client client) {
         try {
@@ -420,10 +456,13 @@ public interface CSVManager {
             FileWriter fw = new FileWriter(file);
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(data);
+            System.out.println("Client updated successfully!");
+            Audit.writeLog(Audit.Type.CLIENT_UPDATE, true);
             bw.close();
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.CLIENT_UPDATE, false);
         }
     }
     static void updateAccountCSV(String path, Account account) {
@@ -448,10 +487,12 @@ public interface CSVManager {
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(data);
             System.out.println("Account updated successfully!");
+            Audit.writeLog(Audit.Type.ACCOUNT_UPDATE, true);
             bw.close();
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.ACCOUNT_UPDATE, false);
         }
     }
     static void updateSavingsAccountCSV(String path, SavingsAccount account) {
@@ -476,10 +517,12 @@ public interface CSVManager {
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(data);
             System.out.println("Savings account updated successfully!");
+            Audit.writeLog(Audit.Type.SAVINGS_ACCOUNT_UPDATE, true);
             bw.close();
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.SAVINGS_ACCOUNT_UPDATE, false);
         }
     }
     static void updateTransactionCSV(String path, Transaction transaction) {
@@ -504,10 +547,12 @@ public interface CSVManager {
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(data);
             System.out.println("Transaction updated successfully!");
+            Audit.writeLog(Audit.Type.TRANSACTION_UPDATE, true);
             bw.close();
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.TRANSACTION_UPDATE, false);
         }
     }
     static void updateCreditCardCSV(String path, CreditCard card) {
@@ -532,10 +577,12 @@ public interface CSVManager {
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(data);
             System.out.println("Credit card updated successfully!");
+            Audit.writeLog(Audit.Type.CREDIT_CARD_UPDATE, true);
             bw.close();
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.CREDIT_CARD_UPDATE, false);
         }
     }
     static void updateDebitCardCSV(String path, DebitCard card) {
@@ -560,10 +607,12 @@ public interface CSVManager {
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(data);
             System.out.println("Debit card updated successfully!");
+            Audit.writeLog(Audit.Type.DEBIT_CARD_UPDATE, true);
             bw.close();
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.DEBIT_CARD_UPDATE, false);
         }
     }
 
@@ -586,6 +635,10 @@ public interface CSVManager {
             data = data.substring(0, data.length() - 1);
             if (deleted) {
                 System.out.println("Client deleted successfully!");
+                Audit.writeLog(Audit.Type.CLIENT_DELETION, true);
+            } else {
+                System.out.println("Client not found!");
+                Audit.writeLog(Audit.Type.CLIENT_DELETION, false);
             }
             fr.close();
             br.close();
@@ -596,6 +649,7 @@ public interface CSVManager {
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.CLIENT_DELETION, false);
         }
     }
     static void deleteAccountCSV(String path, Account account) {
@@ -616,10 +670,21 @@ public interface CSVManager {
             }
             data = data.substring(0, data.length() - 1);
             if (deleted) {
-                if (account.getClass() == SavingsAccount.class)
+                if (account.getClass() == SavingsAccount.class) {
                     System.out.println("Savings account deleted successfully!");
-                else
+                    Audit.writeLog(Audit.Type.SAVINGS_ACCOUNT_DELETION, true);
+                } else {
                     System.out.println("Account deleted successfully!");
+                    Audit.writeLog(Audit.Type.ACCOUNT_DELETION, true);
+                }
+            } else {
+                if (account.getClass() == SavingsAccount.class) {
+                    System.out.println("Savings account not found!");
+                    Audit.writeLog(Audit.Type.SAVINGS_ACCOUNT_DELETION, false);
+                } else {
+                    System.out.println("Account not found!");
+                    Audit.writeLog(Audit.Type.ACCOUNT_DELETION, false);
+                }
             }
             fr.close();
             br.close();
@@ -630,6 +695,11 @@ public interface CSVManager {
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
+            if (account.getClass() == SavingsAccount.class) {
+                Audit.writeLog(Audit.Type.SAVINGS_ACCOUNT_DELETION, false);
+            } else {
+                Audit.writeLog(Audit.Type.ACCOUNT_DELETION, false);
+            }
         }
     }
     static void deleteTransactionCSV(String path, Transaction transaction) {
@@ -651,6 +721,10 @@ public interface CSVManager {
             data = data.substring(0, data.length() - 1);
             if (deleted) {
                 System.out.println("Transaction deleted successfully!");
+                Audit.writeLog(Audit.Type.TRANSACTION_DELETION, true);
+            } else {
+                System.out.println("Transaction not found!");
+                Audit.writeLog(Audit.Type.TRANSACTION_DELETION, false);
             }
             fr.close();
             br.close();
@@ -661,6 +735,7 @@ public interface CSVManager {
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.TRANSACTION_DELETION, false);
         }
     }
     static void deleteCardCSV(String path, Card card) {
@@ -681,10 +756,21 @@ public interface CSVManager {
             }
             data = data.substring(0, data.length() - 1);
             if (deleted) {
-                if (card.getClass() == CreditCard.class)
+                if (card.getClass() == CreditCard.class) {
                     System.out.println("Credit card deleted successfully!");
-                else
+                    Audit.writeLog(Audit.Type.CREDIT_CARD_DELETION, true);
+                } else {
                     System.out.println("Debit card deleted successfully!");
+                    Audit.writeLog(Audit.Type.DEBIT_CARD_DELETION, true);
+                }
+            } else {
+                if (card.getClass() == CreditCard.class) {
+                    System.out.println("Credit card not found!");
+                    Audit.writeLog(Audit.Type.CREDIT_CARD_DELETION, false);
+                } else {
+                    System.out.println("Debit card not found!");
+                    Audit.writeLog(Audit.Type.DEBIT_CARD_DELETION, false);
+                }
             }
             fr.close();
             br.close();
@@ -695,6 +781,10 @@ public interface CSVManager {
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
+            if (card.getClass() == CreditCard.class)
+                Audit.writeLog(Audit.Type.CREDIT_CARD_DELETION, false);
+            else
+                Audit.writeLog(Audit.Type.DEBIT_CARD_DELETION, false);
         }
     }
 
@@ -707,7 +797,8 @@ public interface CSVManager {
             String[] temporary;
             while ((line = br.readLine()) != null) {
                 temporary = line.split(",");
-                if (temporary[2].equals(transaction.getSourceIBAN()) && temporary[3].equals(transaction.getDestinationIBAN()))
+                if (temporary[2].equals(transaction.getSourceIBAN()) && temporary[3].equals(transaction.getDestinationIBAN())) {
+                    Audit.writeLog(Audit.Type.TRANSACTION_READ, true);
                     if (temporary[0].equals(phoneNumber)) {
                         String[] finalTemporary = temporary;
                         return new HashMap<>() {{
@@ -719,12 +810,15 @@ public interface CSVManager {
                             put(0, finalTemporary[0]);
                         }};
                     }
+                }
             }
             fr.close();
             br.close();
+            Audit.writeLog(Audit.Type.TRANSACTION_READ, false);
             return null;
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.TRANSACTION_READ, false);
             return null;
         }
     }
@@ -738,14 +832,17 @@ public interface CSVManager {
             while ((line = br.readLine()) != null) {
                 temporary = line.split(",");
                 if (temporary[1].equals(IBAN)) {
+                    Audit.writeLog(Audit.Type.ACCOUNT_READ, true);
                     return temporary[0];
                 }
             }
             fr.close();
             br.close();
+            Audit.writeLog(Audit.Type.ACCOUNT_READ, false);
             return null;
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.ACCOUNT_READ, false);
             return null;
         }
     }
@@ -759,14 +856,17 @@ public interface CSVManager {
             while ((line = br.readLine()) != null) {
                 temporary = line.split(",");
                 if (temporary[1].equals(IBAN)) {
+                    Audit.writeLog(Audit.Type.ACCOUNT_READ, true);
                     return CSVManager.readAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv", temporary[0]).getFirst();
                 }
             }
             fr.close();
             br.close();
+            Audit.writeLog(Audit.Type.ACCOUNT_READ, false);
             return null;
         } catch (IOException e) {
             e.printStackTrace();
+            Audit.writeLog(Audit.Type.ACCOUNT_READ, false);
             return null;
         }
     }

@@ -57,6 +57,7 @@ public interface FileManager {
             System.out.println("Client directory does not exist.");
     }
     static void initiateDirectories(String path) {
+        createAuditFile();
         HashMap<String, Client> clients = CSVManager.readClientCSV(path);
         for (String key : clients.keySet()) {
             Client client = clients.get(key);
@@ -101,15 +102,19 @@ public interface FileManager {
         CSVManager.addClientCSV(path + "account_details.csv", client);
     }
     static void createAuditFile() {
-        String path = "/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/audit_log.csv";
-        File directory = new File(path);
+        try {
+            String path = "/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/audit_log.csv";
+            File directory = new File(path);
 
-        if (!directory.exists())
-            if (directory.mkdir())
-                System.out.println("Audit log file created successfully!");
+            if (!directory.exists())
+                if (directory.createNewFile())
+                    System.out.println("Audit log file created successfully!");
+                else
+                    System.out.println("Failed to create audit log file.");
             else
-                System.out.println("Failed to create audit log file.");
-        else
-            System.out.println("Audit log file already exists.");
+                System.out.println("Audit log file already exists.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

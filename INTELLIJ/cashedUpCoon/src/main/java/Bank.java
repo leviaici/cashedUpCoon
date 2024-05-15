@@ -92,6 +92,7 @@ public class Bank {
         CSVManager.addClientCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/clients_test.csv", newClient);
         FileManager.initiateDirectory(newClient);
         System.out.println("Account created successfully.");
+        Audit.writeLog(Audit.Type.CLIENT_CREATION, true);
         menu = 0;
     }
 
@@ -110,14 +111,17 @@ public class Bank {
             }
             if (clients.get(phoneNumber).getPassword().equals(password)) {
                 System.out.println("Login successful.");
+                Audit.writeLog(Audit.Type.CLIENT_LOGIN, true);
                 client = clients.get(phoneNumber);
                 menu = 3;
             } else {
                 System.out.println("Too many attempts. Please try again later.");
+                Audit.writeLog(Audit.Type.CLIENT_LOGIN, false);
                 menu = -1;
             }
         } else {
             System.out.println("Client not found. Please try again.");
+            Audit.writeLog(Audit.Type.CLIENT_LOGIN, false);
         }
     }
 
