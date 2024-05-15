@@ -32,6 +32,12 @@ public class Account {
         this.currency = currency;
     }
 
+    public Account(String IBAN, Currencies currency) {
+        this.IBAN = IBAN;
+        this.balance = 0.0f;
+        this.currency = currency;
+    }
+
     public String getIBAN() {
         return IBAN;
     }

@@ -1,3 +1,5 @@
+import Exceptions.AccountIsSavingsAccount;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -208,35 +210,55 @@ public class Bank {
             return;
         }
         System.out.println("Transfer Money:");
-        System.out.println("From Account: ");
+        System.out.println("Select Account: ");
+        client.printAccountIBANs();
         String fromIBAN = scanner.next();
-        if (client.getAccount(fromIBAN) == null) {
-            System.out.println("Account not found. Please try again.");
-            menu = 3;
-            return;
-        }
+        fromIBAN = client.getAccounts().get(Integer.parseInt(fromIBAN) - 1).getIBAN();
+        System.out.println(fromIBAN + " selected.");
+        System.out.println("Make sure the destination account is not a savings account, otherwise you will not be able to transfer money.");
         System.out.println("To Account: ");
         String toIBAN = scanner.next();
         Account destination = CSVManager.getAccountFromIBAN(toIBAN);
         System.out.println("Amount: ");
         float amount = scanner.nextFloat();
-        if (!client.getAccount(fromIBAN).transferFunds(destination, amount)) {
-            System.out.println("Insufficient funds. Please try again.");
-            menu = 3;
-            return;
+        if (destination != null) {
+            if (!client.getAccount(fromIBAN).transferFunds(destination, amount)) {
+                System.out.println("Insufficient funds. Please try again.");
+                menu = 3;
+                return;
+            }
+        } else {
+            try {
+                if (CSVManager.getSavingsAccountFromIBAN(toIBAN) != null) {
+                    menu = 3;
+                    throw new AccountIsSavingsAccount("Cannot transfer funds to a savings account.");
+                }
+            } catch (AccountIsSavingsAccount e) {
+                e.printStackTrace();
+                menu = 3;
+                return;
+            }
+            if (!client.getAccount(fromIBAN).transferFunds(new Account(toIBAN, client.getAccount(fromIBAN).getCurrency()), amount)) {
+                System.out.println("Insufficient funds. Please try again.");
+                menu = 3;
+                return;
+            }
         }
         Currencies currency = client.getAccount(fromIBAN).getCurrency();
         Transaction transaction = new Transaction(fromIBAN, toIBAN, amount, currency);
-        destination.addTransaction(transaction);
+        if (destination != null) {
+            destination.addTransaction(transaction);
+            CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv", destination);
+        }
         CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv", client.getAccount(fromIBAN));
-        CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv", destination);
         CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/accounts.csv", client.getAccount(fromIBAN));
         String otherPhoneNumber = CSVManager.getPhoneNumberFromIBAN(toIBAN);
-        CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + otherPhoneNumber + "/accounts.csv", destination);
         CSVManager.addTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/transactions_test.csv", client.getPhoneNumber(), otherPhoneNumber, transaction);
         CSVManager.addTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/transactions.csv", client.getPhoneNumber(), otherPhoneNumber, transaction);
-        if (otherPhoneNumber != null)
+        if (otherPhoneNumber != null) {
+            CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + otherPhoneNumber + "/accounts.csv", destination);
             CSVManager.addTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + otherPhoneNumber + "/transactions.csv", client.getPhoneNumber(), otherPhoneNumber, transaction);
+        }
         System.out.println("Transaction successful.");
         menu = 3;
     }

@@ -92,7 +92,7 @@ public interface CSVManager {
                 Transaction transaction;
                 temporary = line.split(",");
                 if (temporary[0].equals(phoneNumber) || temporary[1].equals(phoneNumber)) {
-                    transaction = new Transaction(temporary[2], temporary[3], Float.parseFloat(temporary[4]), Currencies.valueOf(temporary[5]), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(temporary[6]));
+                    transaction = new Transaction(temporary[2], temporary[3], Float.parseFloat(temporary[4]), Currencies.valueOf(temporary[5]), new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").parse(temporary[6]));
                     transactions.add(transaction);
                 }
             }
@@ -867,6 +867,30 @@ public interface CSVManager {
         } catch (IOException e) {
             e.printStackTrace();
             Audit.writeLog(Audit.Type.ACCOUNT_READ, false);
+            return null;
+        }
+    }
+    static SavingsAccount getSavingsAccountFromIBAN(String IBAN) {
+        try {
+            File file = new File("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/savings_accounts_test.csv");
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            while ((line = br.readLine()) != null) {
+                temporary = line.split(",");
+                if (temporary[1].equals(IBAN)) {
+                    Audit.writeLog(Audit.Type.SAVINGS_ACCOUNT_READ, true);
+                    return CSVManager.readSavingsAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/savings_accounts_test.csv", temporary[0]).getFirst();
+                }
+            }
+            fr.close();
+            br.close();
+            Audit.writeLog(Audit.Type.SAVINGS_ACCOUNT_READ, false);
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            Audit.writeLog(Audit.Type.SAVINGS_ACCOUNT_READ, false);
             return null;
         }
     }

@@ -144,6 +144,13 @@ public class Client {
         return null;
     }
 
+    public SavingsAccount getSavingsAccount(String IBAN) {
+        for (Account account : accounts)
+            if (account.getIBAN().equals(IBAN) && account instanceof SavingsAccount)
+                return (SavingsAccount) account;
+        return null;
+    }
+
     public void setAccounts(ArrayList<Account> accounts) {
         this.accounts = accounts;
     }
@@ -154,6 +161,22 @@ public class Client {
 
     public void setCards(ArrayList<Card> cards) {
         this.cards = cards;
+    }
+
+    public void printAccountIBANs() {
+        int index = 1;
+        for (Account account : accounts)
+            if (!(account instanceof SavingsAccount))
+                System.out.println(index++ + ". " + account.getIBAN());
+        System.out.println("1 - " + (index - 1) + ": ");
+    }
+
+    public void printSavingsAccountIBANs() {
+        int index = 1;
+        for (Account account : accounts)
+            if (account instanceof SavingsAccount)
+                System.out.println(index++ + ". " + account.getIBAN());
+        System.out.println("1 - " + (index - 1) + ": ");
     }
 
     @Override
