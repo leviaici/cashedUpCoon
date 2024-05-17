@@ -175,7 +175,7 @@ public class Client {
         int index = 1;
         for (Account account : accounts)
             if (!(account instanceof SavingsAccount))
-                System.out.println(index++ + ". " + account.getIBAN());
+                System.out.println(index++ + ". " + account.getIBAN() + " - " + account.getBalance() + " " + account.getCurrency());
         System.out.println("1 - " + (index - 1) + ": ");
     }
 
@@ -183,7 +183,7 @@ public class Client {
         int index = 1;
         for (Account account : accounts)
             if (account instanceof SavingsAccount)
-                System.out.println(index++ + ". " + account.getIBAN());
+                System.out.println(index++ + ". " + account.getIBAN() + " - " + account.getBalance() + " " + account.getCurrency());
         System.out.println("1 - " + (index - 1) + ": ");
     }
 
