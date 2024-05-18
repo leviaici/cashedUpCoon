@@ -170,10 +170,30 @@ public class Bank {
     }
 
     private void viewTransactions() {
-        System.out.println("Transactions:");
-        for (Account account : client.getAccounts())
-            for (Transaction transaction : account.getTransactions())
+        System.out.println("Select which type of account's transactions you want to view: ");
+        System.out.println("1. Regular Account");
+        System.out.println("2. Savings Account");
+        System.out.println("3. All Accounts");
+        int choice = getUserChoice();
+        int index;
+        if (choice == 1) {
+            client.printAccountIBANs();
+            System.out.println("Select Account: ");
+            index = getUserChoice() - 1;
+            for (Transaction transaction : client.getAccounts().get(index).getTransactions())
                 System.out.println(transaction);
+        } else if (choice == 2) {
+            client.printSavingsAccountIBANs();
+            System.out.println("Select Savings Account: ");
+            index = getUserChoice() - 1;
+            for (Transaction transaction : client.getSavingsAccounts().get(index).getTransactions())
+                System.out.println(transaction);
+        } else {
+            System.out.println("Transactions:");
+            for (Account account : client.getAccounts())
+                for (Transaction transaction : account.getTransactions())
+                    System.out.println(transaction);
+        }
         menu = 3;
     }
 
