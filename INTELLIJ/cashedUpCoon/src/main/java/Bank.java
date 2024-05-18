@@ -234,14 +234,57 @@ public class Bank {
                 menu = 3;
                 return;
             }
-            if (!client.getAccount(fromIBAN).transferFunds(new Account(toIBAN, client.getAccount(fromIBAN).getCurrency()), amount)) {
+            Currencies currency;
+            String currencyString = toIBAN.substring(0, 2);
+            switch (currencyString) {
+                case "RO":
+                    currency = Currencies.RON;
+                    break;
+                case "EU":
+                    currency = Currencies.EUR;
+                    break;
+                case "US":
+                    currency = Currencies.USD;
+                    break;
+                case "GB":
+                    currency = Currencies.GBP;
+                    break;
+                default:
+                    Audit.writeLog(Audit.Type.TRANSACTION_CREATION, false);
+                    menu = 3;
+                    return;
+            }
+            if (!client.getAccount(fromIBAN).transferFunds(new Account(toIBAN, currency), amount)) {
                 System.out.println("Insufficient funds. Please try again.");
                 Audit.writeLog(Audit.Type.TRANSACTION_CREATION, false);
                 menu = 3;
                 return;
             }
         }
-        Currencies currency = client.getAccount(fromIBAN).getCurrency();
+        Currencies currency;
+        if (destination == null) {
+            String currencyString = toIBAN.substring(0, 2);
+            switch (currencyString) {
+                case "RO":
+                    currency = Currencies.RON;
+                    break;
+                case "EU":
+                    currency = Currencies.EUR;
+                    break;
+                case "US":
+                    currency = Currencies.USD;
+                    break;
+                case "GB":
+                    currency = Currencies.GBP;
+                    break;
+                default:
+                    Audit.writeLog(Audit.Type.TRANSACTION_CREATION, false);
+                    menu = 3;
+                    return;
+            }
+        } else {
+            currency = destination.getCurrency();
+        }
         Transaction transaction = new Transaction(fromIBAN, toIBAN, amount, currency);
         if (destination != null) {
             destination.addTransaction(transaction);
@@ -348,7 +391,7 @@ public class Bank {
         CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/accounts.csv", client.getAccount(fromIBAN));
         CSVManager.updateSavingsAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/savings_accounts_test.csv", client.getSavingsAccount(toIBAN));
         CSVManager.updateSavingsAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/savings_accounts.csv", client.getSavingsAccount(toIBAN));
-        Transaction transaction = new Transaction(fromIBAN, toIBAN, amount, client.getAccount(fromIBAN).getCurrency());
+        Transaction transaction = new Transaction(fromIBAN, toIBAN, amount, client.getAccount(toIBAN).getCurrency());
         CSVManager.addTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/transactions_test.csv", client.getPhoneNumber(), client.getPhoneNumber(), transaction);
         CSVManager.addTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/transactions.csv", client.getPhoneNumber(), client.getPhoneNumber(), transaction);
         System.out.println("Transaction successful.");
@@ -382,7 +425,7 @@ public class Bank {
             menu = 3;
             return;
         }
-        Currencies currency = client.getSavingsAccount(fromIBAN).getCurrency();
+        Currencies currency = destination.getCurrency();
         Transaction transaction = new Transaction(fromIBAN, destination.getIBAN(), amount, currency);
         destination.addTransaction(transaction);
         CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv", destination);

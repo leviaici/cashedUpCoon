@@ -87,10 +87,43 @@ public class Account {
     }
 
     public boolean transferFunds(Account destination, float amount) {
-        if (balance < amount)
+        float newAmount = amount;
+        if (currency != destination.getCurrency()) {
+            switch (currency) {
+                case USD:
+                    switch (destination.getCurrency()) {
+                        case EUR -> newAmount *= 1.09f;
+                        case RON -> newAmount *= 0.22f;
+                        case GBP -> newAmount *= 1.27f;
+                    }
+                    break;
+                case EUR:
+                    switch (destination.getCurrency()) {
+                        case USD -> newAmount *= 0.92f;
+                        case RON -> newAmount *= 0.2f;
+                        case GBP -> newAmount *= 1.16f;
+                    }
+                    break;
+                case RON:
+                    switch (destination.getCurrency()) {
+                        case USD -> newAmount *= 4.58f;
+                        case EUR -> newAmount *= 4.98f;
+                        case GBP -> newAmount *= 5.8f;
+                    }
+                    break;
+                case GBP:
+                    switch (destination.getCurrency()) {
+                        case USD -> newAmount *= 0.79f;
+                        case EUR -> newAmount *= 0.86f;
+                        case RON -> newAmount *= 0.17f;
+                    }
+                    break;
+            }
+        }
+        if (balance < newAmount)
             return false;
-        addTransaction(new Transaction(IBAN, destination.getIBAN(), amount, currency));
-        withdrawFunds(amount);
+        addTransaction(new Transaction(IBAN, destination.getIBAN(), amount, destination.getCurrency()));
+        withdrawFunds(newAmount);
         destination.addFunds(amount);
         return true;
     }

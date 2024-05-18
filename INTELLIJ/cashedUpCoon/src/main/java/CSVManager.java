@@ -857,7 +857,7 @@ public interface CSVManager {
                 temporary = line.split(",");
                 if (temporary[1].equals(IBAN)) {
                     Audit.writeLog(Audit.Type.ACCOUNT_READ, true);
-                    return CSVManager.readAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv", temporary[0]).getFirst();
+                    return new Account(temporary[1], Float.parseFloat(temporary[2]), Currencies.valueOf(temporary[3]));
                 }
             }
             fr.close();
