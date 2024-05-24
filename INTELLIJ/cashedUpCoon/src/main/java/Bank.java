@@ -140,13 +140,14 @@ public class Bank {
         System.out.println("9. View Client Account Details");
         System.out.println("10. Save Money");
         System.out.println("11. Transfer Money from Savings Account");
+        System.out.println("12. Block Card");
         System.out.println("0. Exit");
         System.out.print("Enter your choice: ");
         menu = getUserChoice() + 3;
         if (menu == 3)
             menu = -1;
         else
-        if (menu > 14) {
+        if (menu > 15) {
             clientAccountMenu();
             System.out.println("Invalid choice. Please try again.");
         }
@@ -439,6 +440,47 @@ public class Bank {
         menu = 3;
     }
 
+    private void blockUnblockCard() {
+        if (client.getCards().isEmpty()) {
+            System.out.println("No cards found. Please apply for a card first.");
+            Audit.writeLog(Audit.Type.CARD_READ, false);
+            menu = 3;
+            return;
+        }
+        System.out.println("Block/Unblock Card:");
+        int index = 1;
+        System.out.println("Cards:");
+        for (Card card : client.getCards())
+            if (card instanceof DebitCard)
+                System.out.println(index++ + ". Debit Card: " + card);
+            else
+                System.out.println(index++ +  ". Credit Card: " + card);
+        System.out.println("Select Card to block/unblock: ");
+        int choice = getUserChoice() - 1;
+        Card card = client.getCards().get(choice);
+        card.setBlocked(!card.getBlocked());
+        if (card instanceof CreditCard) {
+            Audit.writeLog(Audit.Type.CREDIT_CARD_READ, true);
+            CSVManager.updateCreditCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/credit_cards.csv", (CreditCard) card);
+            CSVManager.updateCreditCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/credit_card_test.csv", (CreditCard) card);
+            if (card.getBlocked())
+                System.out.println("Credit Card blocked successfully.");
+            else
+                System.out.println("Credit Card unblocked successfully.");
+            Audit.writeLog(Audit.Type.CREDIT_CARD_UPDATE, true);
+        } else {
+            Audit.writeLog(Audit.Type.DEBIT_CARD_READ, true);
+            CSVManager.updateDebitCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/debit_cards.csv", (DebitCard) card);
+            CSVManager.updateDebitCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/debit_card_test.csv", (DebitCard) card);
+            if (card.getBlocked())
+                System.out.println("Debit Card blocked successfully.");
+            else
+                System.out.println("Debit Card unblocked successfully.");
+            Audit.writeLog(Audit.Type.DEBIT_CARD_UPDATE, true);
+        }
+        menu = 3;
+    }
+
     public void run() {
         FileManager.initiateDirectories("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/clients_test.csv");
         initiateClients();
@@ -495,6 +537,9 @@ public class Bank {
                     break;
                 case 14:
                     transferMoneyFromSavingsAccount();
+                    break;
+                case 15:
+                    blockUnblockCard();
                     break;
                 default:
                     System.out.println("Invalid choice. Please try again.");
