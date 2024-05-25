@@ -139,7 +139,7 @@ public class Account {
         String toBeIBAN = prefix;
         for (int i = 0; i < 14; i++)
             toBeIBAN += (int) (Math.random() * 10);
-        while (CSVManager.getAccountFromIBAN(toBeIBAN) != null) {
+        while (CSVReader.getAccountFromIBAN(toBeIBAN) != null) {
             toBeIBAN = prefix;
             for (int i = 0; i < 14; i++)
                 toBeIBAN += (int) (Math.random() * 10);

@@ -25,16 +25,16 @@ public class Bank {
     }
 
     public void initiateClients() {
-        clients = CSVManager.readClientCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/clients_test.csv");
+        clients = CSVReader.readClientCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/clients_test.csv");
         String filePath = "/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/";
         for (String phoneNumber : clients.keySet()) {
             String path = filePath + phoneNumber;
-            ArrayList<Transaction> transactions = CSVManager.readTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/transactions_test.csv", phoneNumber);
-            ArrayList<Account> accounts = CSVManager.readAccountCSV(path + "/accounts.csv", phoneNumber);
-            ArrayList<SavingsAccount> savingsAccounts = CSVManager.readSavingsAccountCSV(path + "/savings_accounts.csv", phoneNumber);
+            ArrayList<Transaction> transactions = CSVReader.readTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/transactions_test.csv", phoneNumber);
+            ArrayList<Account> accounts = CSVReader.readAccountCSV(path + "/accounts.csv", phoneNumber);
+            ArrayList<SavingsAccount> savingsAccounts = CSVReader.readSavingsAccountCSV(path + "/savings_accounts.csv", phoneNumber);
             ArrayList<Account> allAccounts = new ArrayList<>();
-            ArrayList<DebitCard> debitCards = CSVManager.readDebitCardCSV(path + "/debit_cards.csv", phoneNumber);
-            ArrayList<CreditCard> creditCards = CSVManager.readCreditCardCSV(path + "/credit_cards.csv", phoneNumber);
+            ArrayList<DebitCard> debitCards = CSVReader.readDebitCardCSV(path + "/debit_cards.csv", phoneNumber);
+            ArrayList<CreditCard> creditCards = CSVReader.readCreditCardCSV(path + "/credit_cards.csv", phoneNumber);
             ArrayList<Card> allCards = new ArrayList<>();
             allAccounts.addAll(accounts);
             allAccounts.addAll(savingsAccounts);
@@ -213,7 +213,7 @@ public class Bank {
         System.out.println("Make sure the destination account is not a savings account, otherwise you will not be able to transfer money.");
         System.out.println("To Account: ");
         String toIBAN = scanner.next();
-        Account destination = CSVManager.getAccountFromIBAN(toIBAN);
+        Account destination = CSVReader.getAccountFromIBAN(toIBAN);
         System.out.println("Amount: ");
         float amount = scanner.nextFloat();
         if (destination != null) {
@@ -225,7 +225,7 @@ public class Bank {
             }
         } else {
             try {
-                if (CSVManager.getSavingsAccountFromIBAN(toIBAN) != null) {
+                if (CSVReader.getSavingsAccountFromIBAN(toIBAN) != null) {
                     menu = 3;
                     throw new AccountIsSavingsAccount("Cannot transfer funds to a savings account.");
                 }
@@ -293,7 +293,7 @@ public class Bank {
         }
         CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv", client.getAccount(fromIBAN));
         CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/accounts.csv", client.getAccount(fromIBAN));
-        String otherPhoneNumber = CSVManager.getPhoneNumberFromIBAN(toIBAN);
+        String otherPhoneNumber = CSVReader.getPhoneNumberFromIBAN(toIBAN);
         CSVManager.addTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/transactions_test.csv", client.getPhoneNumber(), otherPhoneNumber, transaction);
         CSVManager.addTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/transactions.csv", client.getPhoneNumber(), otherPhoneNumber, transaction);
         if (otherPhoneNumber != null) {
@@ -311,7 +311,7 @@ public class Bank {
         CreditCard creditCard = new CreditCard(creditLimit);
         client.addCard(creditCard);
         CSVManager.addCreditCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/credit_cards.csv", client.getPhoneNumber(), creditCard);
-        CSVManager.addCreditCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/credit_cards_test.csv", client.getPhoneNumber(), creditCard);
+        CSVManager.addCreditCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/credit_card_test.csv", client.getPhoneNumber(), creditCard);
         System.out.println("Credit Card application successful. Here are your card details:");
         System.out.println(creditCard);
         menu = 3;
@@ -324,7 +324,7 @@ public class Bank {
         DebitCard debitCard = new DebitCard(withdrawalLimit);
         client.addCard(debitCard);
         CSVManager.addDebitCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/debit_cards.csv", client.getPhoneNumber(), debitCard);
-        CSVManager.addDebitCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/debit_cards_test.csv", client.getPhoneNumber(), debitCard);
+        CSVManager.addDebitCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/debit_card_test.csv", client.getPhoneNumber(), debitCard);
         System.out.println("Debit Card application successful. Here are your card details:");
         System.out.println(debitCard);
         menu = 3;

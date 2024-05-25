@@ -58,16 +58,16 @@ public interface FileManager {
     }
     static void initiateDirectories(String path) {
         createAuditFile();
-        HashMap<String, Client> clients = CSVManager.readClientCSV(path);
+        HashMap<String, Client> clients = CSVReader.readClientCSV(path);
         for (String key : clients.keySet()) {
             Client client = clients.get(key);
             String filePath = "/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/";
             deleteClientMainDirectory(client);
-            ArrayList<Account> accounts = CSVManager.readAccountCSV(filePath + "accounts_test.csv", client.getPhoneNumber());
-            ArrayList<SavingsAccount> savingsAccounts = CSVManager.readSavingsAccountCSV(filePath + "savings_accounts_test.csv", client.getPhoneNumber());
-            ArrayList<Transaction> transactions = CSVManager.readTransactionCSV(filePath + "transactions_test.csv", client.getPhoneNumber());
-            ArrayList<CreditCard> creditCards = CSVManager.readCreditCardCSV(filePath + "credit_card_test.csv", client.getPhoneNumber());
-            ArrayList<DebitCard> debitCards = CSVManager.readDebitCardCSV(filePath + "debit_card_test.csv", client.getPhoneNumber());
+            ArrayList<Account> accounts = CSVReader.readAccountCSV(filePath + "accounts_test.csv", client.getPhoneNumber());
+            ArrayList<SavingsAccount> savingsAccounts = CSVReader.readSavingsAccountCSV(filePath + "savings_accounts_test.csv", client.getPhoneNumber());
+            ArrayList<Transaction> transactions = CSVReader.readTransactionCSV(filePath + "transactions_test.csv", client.getPhoneNumber());
+            ArrayList<CreditCard> creditCards = CSVReader.readCreditCardCSV(filePath + "credit_card_test.csv", client.getPhoneNumber());
+            ArrayList<DebitCard> debitCards = CSVReader.readDebitCardCSV(filePath + "debit_card_test.csv", client.getPhoneNumber());
             filePath = filePath + client.getPhoneNumber() + "/";
 
             FileManager.createClientMainDirectory(client);   // creating main directory of client
@@ -77,7 +77,7 @@ public interface FileManager {
             for (SavingsAccount account : savingsAccounts)
                 CSVManager.addSavingsAccountCSV(filePath + "savings_accounts.csv", client.getPhoneNumber(), account);
             for (Transaction transaction : transactions) {
-                HashMap<Integer, String> otherPhoneNumber = CSVManager.getPhoneNumberFromTransaction("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/transactions_test.csv", transaction, client.getPhoneNumber());
+                HashMap<Integer, String> otherPhoneNumber = CSVReader.getPhoneNumberFromTransaction("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/transactions_test.csv", transaction, client.getPhoneNumber());
                 for (int index : otherPhoneNumber.keySet())
                     if (index == 1)
                         CSVManager.addTransactionCSV(filePath + "transactions.csv", client.getPhoneNumber(), otherPhoneNumber.get(index), transaction);

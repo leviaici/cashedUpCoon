@@ -18,7 +18,7 @@ public interface Audit {
         SAVE_MONEY
     }
 
-    static void writeLog(Type log, Boolean success) {
+    static void  writeLog(Type log, Boolean success) {
         String path = "/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/audit_log.csv";
         try {
             File file = new File(path);
@@ -31,7 +31,7 @@ public interface Audit {
                 bw.newLine();
             }
             bw.write(log.toString() + "," + success.toString() + "," + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-            System.out.println("Log updated successfully!");
+//            System.out.println("Log updated successfully!");
             bw.close();
             fw.close();
         } catch (IOException e) {
