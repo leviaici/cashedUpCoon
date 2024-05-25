@@ -1,8 +1,9 @@
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
 
-public class Client {
+public class Client implements CSVManager {
     private String name;
     private String email;
     private String phoneNumber;
@@ -185,6 +186,136 @@ public class Client {
             if (account instanceof SavingsAccount)
                 System.out.println(index++ + ". " + account.getIBAN() + " - " + account.getBalance() + " " + account.getCurrency());
         System.out.println("1 - " + (index - 1) + ": ");
+    }
+
+    @Override
+    public boolean verifyNotInCSV(String path) {
+        try {
+            File file = new File(path);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            while ((line = br.readLine()) != null) {
+                temporary = line.split(",");
+                if (temporary[2].equals(this.phoneNumber) || temporary[1].equals(this.email)) {
+                    fr.close();
+                    br.close();
+                    return false;
+                }
+            }
+            fr.close();
+            br.close();
+            Audit.writeLog(Audit.Type.CLIENT_READ, true);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            Audit.writeLog(Audit.Type.CLIENT_READ, false);
+            return false;
+        }
+    }
+
+    @Override
+    public void addCSV(String path, String ... phoneNumber) {
+        try {
+            File file = new File(path);
+            FileWriter fw = new FileWriter(file, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            if (file.length() != 0) {
+                if (verifyNotInCSV(path)) {
+                    bw.newLine();
+                } else {
+                    bw.close();
+                    fw.close();
+                    Audit.writeLog(Audit.Type.CLIENT_CREATION, false);
+                    return;
+                }
+            }
+            bw.write(this.name + "," + this.email + "," + this.phoneNumber + "," + this.address + "," + this.password);
+            Audit.writeLog(Audit.Type.CLIENT_CREATION, true);
+            bw.close();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Audit.writeLog(Audit.Type.CLIENT_CREATION, false);
+        }
+    }
+
+    @Override
+    public void updateCSV(String path) {
+        try {
+            File file = new File(path);
+            if (file.length() != 0) {
+                if (verifyNotInCSV(path)) {
+                    addCSV(path);
+                    return;
+                }
+            }
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            String data = "";
+            while ((line = br.readLine()) != null) {
+                temporary = line.split(",");
+                if (temporary[2].equals(this.phoneNumber) || temporary[1].equals(this.email))
+                    data += this.name + "," + this.email + "," + this.phoneNumber + "," + this.address + "," + this.password + "\n";
+                else
+                    data += line + "\n";
+            }
+            data = data.substring(0, data.length() - 1);
+            fr.close();
+            br.close();
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(data);
+            Audit.writeLog(Audit.Type.CLIENT_UPDATE, true);
+            bw.close();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Audit.writeLog(Audit.Type.CLIENT_UPDATE, false);
+        }
+    }
+
+    @Override
+    public void deleteCSV(String path) {
+        try {
+            boolean deleted = false;
+            File file = new File(path);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            String data = "";
+            while ((line = br.readLine()) != null) {
+                temporary = line.split(",");
+                if (!(temporary[2].equals(this.phoneNumber)))
+                    data += line + "\n";
+                else
+                    deleted = true;
+            }
+            data = data.substring(0, data.length() - 1);
+            if (deleted) {
+                Audit.writeLog(Audit.Type.CLIENT_DELETION, true);
+            } else {
+                System.out.println("Client not found!");
+                Audit.writeLog(Audit.Type.CLIENT_DELETION, false);
+            }
+            fr.close();
+            br.close();
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(data);
+            bw.close();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Audit.writeLog(Audit.Type.CLIENT_DELETION, false);
+        }
     }
 
     @Override

@@ -73,30 +73,30 @@ public interface FileManager {
             FileManager.createClientMainDirectory(client);   // creating main directory of client
             FileManager.createClientFiles(client);  // creating subdirectories of client (accounts, transactions, cards)
             for (Account account : accounts)
-                CSVManager.addAccountCSV(filePath + "accounts.csv", client.getPhoneNumber(), account);
+                account.addCSV(filePath + "accounts.csv", client.getPhoneNumber());
             for (SavingsAccount account : savingsAccounts)
-                CSVManager.addSavingsAccountCSV(filePath + "savings_accounts.csv", client.getPhoneNumber(), account);
+                account.addCSV(filePath + "savings_accounts.csv", client.getPhoneNumber());
             for (Transaction transaction : transactions) {
                 HashMap<Integer, String> otherPhoneNumber = CSVReader.getPhoneNumberFromTransaction("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/transactions_test.csv", transaction, client.getPhoneNumber());
                 for (int index : otherPhoneNumber.keySet())
                     if (index == 1)
-                        CSVManager.addTransactionCSV(filePath + "transactions.csv", client.getPhoneNumber(), otherPhoneNumber.get(index), transaction);
+                        transaction.addCSV(filePath + "transactions.csv", client.getPhoneNumber(), otherPhoneNumber.get(index));
                     else
-                        CSVManager.addTransactionCSV(filePath + "transactions.csv", otherPhoneNumber.get(index), client.getPhoneNumber(), transaction);
+                        transaction.addCSV(filePath + "transactions.csv", otherPhoneNumber.get(index), client.getPhoneNumber());
             }
             for (CreditCard card : creditCards)
-                CSVManager.addCreditCardCSV(filePath + "credit_cards.csv", client.getPhoneNumber(), card);
+                card.addCSV(filePath + "credit_cards.csv", client.getPhoneNumber());
             for (DebitCard card : debitCards)
-                CSVManager.addDebitCardCSV(filePath + "debit_cards.csv", client.getPhoneNumber(), card);
+                card.addCSV(filePath + "debit_cards.csv", client.getPhoneNumber());
 
-            CSVManager.addClientCSV(filePath + "account_details.csv", client);
+            client.addCSV(filePath + "account_details.csv");
         }
     }
     static void initiateDirectory(Client client) {
         String path = "/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/";
         FileManager.createClientMainDirectory(client);
         FileManager.createClientFiles(client);
-        CSVManager.addClientCSV(path + "account_details.csv", client);
+        client.addCSV(path + "account_details.csv");
     }
     static void createAuditFile() {
         try {

@@ -1,7 +1,8 @@
+import java.io.*;
 import java.util.Objects;
 import java.util.ArrayList;
 
-public class Account {
+public class Account implements CSVManager {
     private String IBAN;
     private float balance;
     private Currencies currency; // possible mappings: USD, EUR, RON, GBP, etc.
@@ -145,6 +146,143 @@ public class Account {
                 toBeIBAN += (int) (Math.random() * 10);
         }
         return toBeIBAN;
+    }
+
+    @Override
+    public boolean verifyNotInCSV(String path) {
+        try {
+            File file = new File(path);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            while ((line = br.readLine()) != null) {
+                temporary = line.split(",");
+                if (temporary[1].equals(this.IBAN)) {
+                    fr.close();
+                    br.close();
+                    return false;
+                }
+            }
+            fr.close();
+            br.close();
+            Audit.writeLog(Audit.Type.ACCOUNT_READ, true);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            Audit.writeLog(Audit.Type.ACCOUNT_READ, false);
+            return false;
+        }
+    }
+
+    @Override
+    public void addCSV(String path, String ... phoneNumber) {
+        try {
+            File file = new File(path);
+            FileWriter fw = new FileWriter(file, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            if (file.length() != 0) {
+                if (verifyNotInCSV(path)) {
+                    bw.newLine();
+                } else {
+                    bw.close();
+                    fw.close();
+                    Audit.writeLog(Audit.Type.ACCOUNT_CREATION, false);
+                    return;
+                }
+            }
+            bw.write(phoneNumber[0] + "," + this.IBAN + "," + this.balance + "," + this.currency);
+            Audit.writeLog(Audit.Type.ACCOUNT_CREATION, true);
+            bw.close();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Audit.writeLog(Audit.Type.ACCOUNT_CREATION, false);
+        }
+    }
+
+    @Override
+    public void updateCSV(String path) {
+        try {
+            File file = new File(path);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            String data = "";
+            while ((line = br.readLine()) != null) {
+                temporary = line.split(",");
+                if (temporary[1].equals(this.IBAN))
+                    data += temporary[0] + "," + this.IBAN + "," + this.balance + "," + this.currency + "\n";
+                else
+                    data += line + "\n";
+            }
+            data = data.substring(0, data.length() - 1);
+            fr.close();
+            br.close();
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(data);
+            Audit.writeLog(Audit.Type.ACCOUNT_UPDATE, true);
+            bw.close();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Audit.writeLog(Audit.Type.ACCOUNT_UPDATE, false);
+        }
+    }
+
+    @Override
+    public void deleteCSV(String path) {
+        try {
+            boolean deleted = false;
+            File file = new File(path);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            String data = "";
+            while ((line = br.readLine()) != null) {
+                temporary = line.split(",");
+                if (!(temporary[1].equals(this.IBAN)))
+                    data += line + "\n";
+                else
+                    deleted = true;
+            }
+            data = data.substring(0, data.length() - 1);
+            if (deleted) {
+                if (this.getClass() == SavingsAccount.class) {
+                    Audit.writeLog(Audit.Type.SAVINGS_ACCOUNT_DELETION, true);
+                } else {
+                    Audit.writeLog(Audit.Type.ACCOUNT_DELETION, true);
+                }
+            } else {
+                if (this.getClass() == SavingsAccount.class) {
+                    System.out.println("Savings account not found!");
+                    Audit.writeLog(Audit.Type.SAVINGS_ACCOUNT_DELETION, false);
+                } else {
+                    System.out.println("Account not found!");
+                    Audit.writeLog(Audit.Type.ACCOUNT_DELETION, false);
+                }
+            }
+            fr.close();
+            br.close();
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(data);
+            bw.close();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            if (this.getClass() == SavingsAccount.class) {
+                Audit.writeLog(Audit.Type.SAVINGS_ACCOUNT_DELETION, false);
+            } else {
+                Audit.writeLog(Audit.Type.ACCOUNT_DELETION, false);
+            }
+        }
     }
 
     @Override

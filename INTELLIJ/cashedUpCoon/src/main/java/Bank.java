@@ -91,7 +91,7 @@ public class Bank {
             password = reader.readLine();
         Client newClient = new Client(name, email, phoneNumber, address, password);
         addClient(newClient);
-        CSVManager.addClientCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/clients_test.csv", newClient);
+        newClient.addCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/clients_test.csv");
         FileManager.initiateDirectory(newClient);
         System.out.println("Account created successfully.");
         Audit.writeLog(Audit.Type.CLIENT_CREATION, true);
@@ -289,16 +289,16 @@ public class Bank {
         Transaction transaction = new Transaction(fromIBAN, toIBAN, amount, currency);
         if (destination != null) {
             destination.addTransaction(transaction);
-            CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv", destination);
+            destination.updateCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv");
         }
-        CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv", client.getAccount(fromIBAN));
-        CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/accounts.csv", client.getAccount(fromIBAN));
+        client.getAccount(fromIBAN).updateCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv");
+        client.getAccount(fromIBAN).updateCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/accounts.csv");
         String otherPhoneNumber = CSVReader.getPhoneNumberFromIBAN(toIBAN);
-        CSVManager.addTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/transactions_test.csv", client.getPhoneNumber(), otherPhoneNumber, transaction);
-        CSVManager.addTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/transactions.csv", client.getPhoneNumber(), otherPhoneNumber, transaction);
+        transaction.addCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/transactions_test.csv", client.getPhoneNumber(), otherPhoneNumber);
+        transaction.addCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/transactions.csv", client.getPhoneNumber(), otherPhoneNumber);
         if (otherPhoneNumber != null) {
-            CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + otherPhoneNumber + "/accounts.csv", destination);
-            CSVManager.addTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + otherPhoneNumber + "/transactions.csv", client.getPhoneNumber(), otherPhoneNumber, transaction);
+            destination.updateCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + otherPhoneNumber + "/accounts.csv");
+            transaction.addCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + otherPhoneNumber + "/transactions.csv", client.getPhoneNumber(), otherPhoneNumber);
         }
         System.out.println("Transaction successful.");
         menu = 3;
@@ -310,8 +310,8 @@ public class Bank {
         float creditLimit = scanner.nextFloat();
         CreditCard creditCard = new CreditCard(creditLimit);
         client.addCard(creditCard);
-        CSVManager.addCreditCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/credit_cards.csv", client.getPhoneNumber(), creditCard);
-        CSVManager.addCreditCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/credit_card_test.csv", client.getPhoneNumber(), creditCard);
+        creditCard.addCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/credit_cards.csv", client.getPhoneNumber());
+        creditCard.addCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/credit_card_test.csv", client.getPhoneNumber());
         System.out.println("Credit Card application successful. Here are your card details:");
         System.out.println(creditCard);
         menu = 3;
@@ -323,8 +323,8 @@ public class Bank {
         int withdrawalLimit = scanner.nextInt();
         DebitCard debitCard = new DebitCard(withdrawalLimit);
         client.addCard(debitCard);
-        CSVManager.addDebitCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/debit_cards.csv", client.getPhoneNumber(), debitCard);
-        CSVManager.addDebitCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/debit_card_test.csv", client.getPhoneNumber(), debitCard);
+        debitCard.addCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/debit_cards.csv", client.getPhoneNumber());
+        debitCard.addCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/debit_card_test.csv", client.getPhoneNumber());
         System.out.println("Debit Card application successful. Here are your card details:");
         System.out.println(debitCard);
         menu = 3;
@@ -336,8 +336,8 @@ public class Bank {
         Currencies currency = Currencies.valueOf(scanner.next().toUpperCase());
         SavingsAccount savingsAccount = new SavingsAccount(currency);
         client.addAccount(savingsAccount);
-        CSVManager.addSavingsAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/savings_accounts.csv", client.getPhoneNumber(), savingsAccount);
-        CSVManager.addSavingsAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/savings_accounts_test.csv", client.getPhoneNumber(), savingsAccount);
+        savingsAccount.addCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/savings_accounts.csv", client.getPhoneNumber());
+        savingsAccount.addCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/savings_accounts_test.csv", client.getPhoneNumber());
         System.out.println("Savings Account application successful. Here are your account details:");
         System.out.println(savingsAccount);
         menu = 3;
@@ -349,8 +349,8 @@ public class Bank {
         Currencies currency = Currencies.valueOf(scanner.next().toUpperCase());
         Account account = new Account(currency);
         client.addAccount(account);
-        CSVManager.addAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/accounts.csv", client.getPhoneNumber(), account);
-        CSVManager.addAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv", client.getPhoneNumber(), account);
+        account.addCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/accounts.csv", client.getPhoneNumber());
+        account.addCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv", client.getPhoneNumber());
         System.out.println("Account opened successfully. Here are your account details:");
         System.out.println(account);
         menu = 3;
@@ -388,13 +388,13 @@ public class Bank {
         toIBAN = client.getSavingsAccounts().get(Integer.parseInt(toIBAN) - 1).getIBAN();
         System.out.println(toIBAN + " selected.");
         client.getAccount(fromIBAN).transferFunds(client.getSavingsAccount(toIBAN), amount);
-        CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv", client.getAccount(fromIBAN));
-        CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/accounts.csv", client.getAccount(fromIBAN));
-        CSVManager.updateSavingsAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/savings_accounts_test.csv", client.getSavingsAccount(toIBAN));
-        CSVManager.updateSavingsAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/savings_accounts.csv", client.getSavingsAccount(toIBAN));
+        client.getAccount(fromIBAN).updateCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv");
+        client.getAccount(fromIBAN).updateCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/accounts.csv");
+        client.getSavingsAccount(toIBAN).updateCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/savings_accounts_test.csv");
+        client.getSavingsAccount(toIBAN).updateCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/savings_accounts.csv");
         Transaction transaction = new Transaction(fromIBAN, toIBAN, amount, client.getAccount(toIBAN).getCurrency());
-        CSVManager.addTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/transactions_test.csv", client.getPhoneNumber(), client.getPhoneNumber(), transaction);
-        CSVManager.addTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/transactions.csv", client.getPhoneNumber(), client.getPhoneNumber(), transaction);
+        transaction.addCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/transactions_test.csv", client.getPhoneNumber(), client.getPhoneNumber());
+        transaction.addCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/transactions.csv", client.getPhoneNumber(), client.getPhoneNumber());
         System.out.println("Transaction successful.");
         Audit.writeLog(Audit.Type.SAVE_MONEY, true);
         menu = 3;
@@ -429,12 +429,12 @@ public class Bank {
         Currencies currency = destination.getCurrency();
         Transaction transaction = new Transaction(fromIBAN, destination.getIBAN(), amount, currency);
         destination.addTransaction(transaction);
-        CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv", destination);
-        CSVManager.updateAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/accounts.csv", destination);
-        CSVManager.updateSavingsAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/savings_accounts.csv", client.getSavingsAccount(fromIBAN));
-        CSVManager.updateSavingsAccountCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/savings_accounts_test.csv", client.getSavingsAccount(fromIBAN));
-        CSVManager.addTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/transactions_test.csv", client.getPhoneNumber(), client.getPhoneNumber(), transaction);
-        CSVManager.addTransactionCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/transactions.csv", client.getPhoneNumber(), client.getPhoneNumber(), transaction);
+        destination.updateCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/accounts_test.csv");
+        destination.updateCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/accounts.csv");
+        client.getSavingsAccount(fromIBAN).updateCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/savings_accounts.csv");
+        client.getSavingsAccount(fromIBAN).updateCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/savings_accounts_test.csv");
+        transaction.addCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/transactions_test.csv", client.getPhoneNumber(), client.getPhoneNumber());
+        transaction.addCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/transactions.csv", client.getPhoneNumber(), client.getPhoneNumber());
         System.out.println("Transaction successful.");
         Audit.writeLog(Audit.Type.TRANSACTION_CREATION, true);
         menu = 3;
@@ -461,8 +461,8 @@ public class Bank {
         card.setBlocked(!card.getBlocked());
         if (card instanceof CreditCard) {
             Audit.writeLog(Audit.Type.CREDIT_CARD_READ, true);
-            CSVManager.updateCreditCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/credit_cards.csv", (CreditCard) card);
-            CSVManager.updateCreditCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/credit_card_test.csv", (CreditCard) card);
+            card.updateCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/credit_cards.csv");
+            card.updateCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/credit_card_test.csv");
             if (card.getBlocked())
                 System.out.println("Credit Card blocked successfully.");
             else
@@ -470,8 +470,8 @@ public class Bank {
             Audit.writeLog(Audit.Type.CREDIT_CARD_UPDATE, true);
         } else {
             Audit.writeLog(Audit.Type.DEBIT_CARD_READ, true);
-            CSVManager.updateDebitCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/debit_cards.csv", (DebitCard) card);
-            CSVManager.updateDebitCardCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/debit_card_test.csv", (DebitCard) card);
+            card.updateCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/" + client.getPhoneNumber() + "/debit_cards.csv"); // DE VERIFICAT!!!!
+            card.updateCSV("/Users/levismac/Documents/INTELLIJ/cashedUpCoon/src/main/resources/debit_card_test.csv");
             if (card.getBlocked())
                 System.out.println("Debit Card blocked successfully.");
             else

@@ -1,8 +1,9 @@
+import java.io.*;
 import java.util.Date;
 import java.util.Objects;
 import java.text.SimpleDateFormat;
 
-public class Transaction {
+public class Transaction implements CSVManager {
     private static int idCounter = 1;
     private int id;
     private String sourceIBAN;
@@ -79,6 +80,130 @@ public class Transaction {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    @Override
+    public boolean verifyNotInCSV(String path) {
+        try {
+            File file = new File(path);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            while ((line = br.readLine()) != null) {
+                temporary = line.split(",");
+                if (temporary[2].equals(this.sourceIBAN) && temporary[3].equals(this.destinationIBAN) && temporary[6].equals(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(this.date))) {
+                    fr.close();
+                    br.close();
+                    return false;
+                }
+            }
+            fr.close();
+            br.close();
+            Audit.writeLog(Audit.Type.TRANSACTION_READ, true);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            Audit.writeLog(Audit.Type.TRANSACTION_READ, false);
+            return false;
+        }
+    }
+
+    @Override
+    public void addCSV(String path, String ... phoneNumber) {
+        try {
+            File file = new File(path);
+            FileWriter fw = new FileWriter(file, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            if (file.length() != 0) {
+                if (verifyNotInCSV(path)) {
+                    bw.newLine();
+                } else {
+                    bw.close();
+                    fw.close();
+                    Audit.writeLog(Audit.Type.TRANSACTION_CREATION, false);
+                    return;
+                }
+            }
+            bw.write(phoneNumber[0] + "," + phoneNumber[1] + "," + this.sourceIBAN + "," + this.destinationIBAN + "," + this.amount + "," + this.currency + "," + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(this.date));
+            Audit.writeLog(Audit.Type.TRANSACTION_CREATION, true);
+            bw.close();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Audit.writeLog(Audit.Type.TRANSACTION_CREATION, false);
+        }
+    }
+
+    @Override
+    public void updateCSV(String path) {
+        try {
+            File file = new File(path);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            String data = "";
+            while ((line = br.readLine()) != null) {
+                temporary = line.split(",");
+                if (temporary[2].equals(this.sourceIBAN) || temporary[3].equals(this.destinationIBAN))
+                    data += temporary[0] + "," + temporary[1] + "," + this.sourceIBAN + "," + this.destinationIBAN + "," + this.amount + "," + this.currency + "," + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.date) + "\n";
+                else
+                    data += line + "\n";
+            }
+            data = data.substring(0, data.length() - 1);
+            fr.close();
+            br.close();
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(data);
+            Audit.writeLog(Audit.Type.TRANSACTION_UPDATE, true);
+            bw.close();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Audit.writeLog(Audit.Type.TRANSACTION_UPDATE, false);
+        }
+    }
+
+    @Override
+    public void deleteCSV(String path) {
+        try {
+            boolean deleted = false;
+            File file = new File(path);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            String[] temporary;
+            String data = "";
+            while ((line = br.readLine()) != null) {
+                temporary = line.split(",");
+                if (!(temporary[2].equals(this.sourceIBAN) && temporary[3].equals(this.destinationIBAN)))
+                    data += line + "\n";
+                else
+                    deleted = true;
+            }
+            data = data.substring(0, data.length() - 1);
+            if (deleted) {
+                Audit.writeLog(Audit.Type.TRANSACTION_DELETION, true);
+            } else {
+                System.out.println("Transaction not found!");
+                Audit.writeLog(Audit.Type.TRANSACTION_DELETION, false);
+            }
+            fr.close();
+            br.close();
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(data);
+            bw.close();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Audit.writeLog(Audit.Type.TRANSACTION_DELETION, false);
+        }
     }
 
     @Override
